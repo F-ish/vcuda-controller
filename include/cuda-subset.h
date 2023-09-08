@@ -70,21 +70,6 @@ typedef uint64_t cuuint64_t;
 typedef unsigned int GLuint; /* 4-byte unsigned */
 typedef unsigned int GLenum;
 
-#if defined(__CUDA_API_VERSION_INTERNAL) || defined(__DOXYGEN_ONLY__) || defined(CUDA_ENABLE_DEPRECATED)
-#define __CUDA_DEPRECATED
-#elif defined(_MSC_VER)
-#define __CUDA_DEPRECATED __declspec(deprecated)
-#elif defined(__GNUC__)
-#define __CUDA_DEPRECATED __attribute__((deprecated))
-#else
-#define __CUDA_DEPRECATED
-#endif
-
-#if defined(CUDA_FORCE_API_VERSION)
-#error "CUDA_FORCE_API_VERSION is no longer supported."
-#endif
-
-
 
 /**
  * CUDA device pointer

@@ -89,6 +89,8 @@ typedef enum {
   CUDA_ENTRY_ENUM(cuDevicePrimaryCtxGetState),
   /** cuDevicePrimaryCtxReset */
   CUDA_ENTRY_ENUM(cuDevicePrimaryCtxReset),
+  /** cuCtxCreate_v2 */
+  CUDA_ENTRY_ENUM(cuCtxCreate_v2),
   /** cuCtxGetFlags */
   CUDA_ENTRY_ENUM(cuCtxGetFlags),
   /** cuCtxSetCurrent */
@@ -127,6 +129,8 @@ typedef enum {
   CUDA_ENTRY_ENUM(cuModuleUnload),
   /** cuModuleGetFunction */
   CUDA_ENTRY_ENUM(cuModuleGetFunction),
+  /** cuModuleGetGlobal_v2 */
+  CUDA_ENTRY_ENUM(cuModuleGetGlobal_v2),
   /** cuModuleGetTexRef */
   CUDA_ENTRY_ENUM(cuModuleGetTexRef),
   /** cuModuleGetSurfRef */
@@ -149,12 +153,20 @@ typedef enum {
   CUDA_ENTRY_ENUM(cuMemAlloc_v2),
   /** cuMemAllocPitch_v2 */
   CUDA_ENTRY_ENUM(cuMemAllocPitch_v2),
+  /** cuMemFree_v2 */
+  CUDA_ENTRY_ENUM(cuMemFree_v2),
+  /** cuMemGetAddressRange_v2 */
+  CUDA_ENTRY_ENUM(cuMemGetAddressRange_v2),
   /** cuMemFreeHost */
   CUDA_ENTRY_ENUM(cuMemFreeHost),
   /** cuMemHostAlloc */
   CUDA_ENTRY_ENUM(cuMemHostAlloc),
+  /** cuMemHostGetDevicePointer_v2 */
+  CUDA_ENTRY_ENUM(cuMemHostGetDevicePointer_v2),
   /** cuMemHostGetFlags */
   CUDA_ENTRY_ENUM(cuMemHostGetFlags),
+  /** cuMemHostRegister_v2 */
+  CUDA_ENTRY_ENUM(cuMemHostRegister_v2),
   /** cuMemHostUnregister */
   CUDA_ENTRY_ENUM(cuMemHostUnregister),
   /** cuPointerGetAttribute */
@@ -181,6 +193,8 @@ typedef enum {
   CUDA_ENTRY_ENUM(cuMemcpyHtoD_v2),
   /** cuMemcpyHtoD_v2_ptds */
   CUDA_ENTRY_ENUM(cuMemcpyHtoD_v2_ptds),
+  /** cuMemcpyHtoDAsync_v2 */
+  CUDA_ENTRY_ENUM(cuMemcpyHtoDAsync_v2),
   /** cuMemcpyHtoDAsync_v2_ptsz */
   CUDA_ENTRY_ENUM(cuMemcpyHtoDAsync_v2_ptsz),
   /** cuMemcpyDtoH_v2 */
@@ -199,8 +213,12 @@ typedef enum {
   CUDA_ENTRY_ENUM(cuMemcpyDtoDAsync_v2),
   /** cuMemcpyDtoDAsync_v2_ptsz */
   CUDA_ENTRY_ENUM(cuMemcpyDtoDAsync_v2_ptsz),
+  /** cuMemcpy2DUnaligned_v2 */
+  CUDA_ENTRY_ENUM(cuMemcpy2DUnaligned_v2),
   /** cuMemcpy2DUnaligned_v2_ptds */
   CUDA_ENTRY_ENUM(cuMemcpy2DUnaligned_v2_ptds),
+  /** cuMemcpy2DAsync_v2 */
+  CUDA_ENTRY_ENUM(cuMemcpy2DAsync_v2),
   /** cuMemcpy2DAsync_v2_ptsz */
   CUDA_ENTRY_ENUM(cuMemcpy2DAsync_v2_ptsz),
   /** cuMemcpy3D_v2 */
@@ -567,6 +585,12 @@ typedef enum {
   CUDA_ENTRY_ENUM(cuLaunchGrid),
   /** cuLaunchGridAsync */
   CUDA_ENTRY_ENUM(cuLaunchGridAsync),
+  /** cuLinkAddData_v2 */
+  CUDA_ENTRY_ENUM(cuLinkAddData_v2),
+  /** cuLinkAddFile_v2 */
+  CUDA_ENTRY_ENUM(cuLinkAddFile_v2),
+  /** cuLinkCreate_v2 */
+  CUDA_ENTRY_ENUM(cuLinkCreate_v2),
   /** cuMemAlloc */
   CUDA_ENTRY_ENUM(cuMemAlloc),
   /** cuMemAllocHost */
@@ -1093,7 +1117,6 @@ typedef enum {
   CUDA_ENTRY_ENUM(cuGraphNodeSetEnabled),
   CUDA_ENTRY_ENUM(cuModuleGetLoadingMode),
   CUDA_ENTRY_ENUM(cuMemGetHandleForAddressRange),
-
   CUDA_ENTRY_END
 } cuda_entry_enum_t;
 

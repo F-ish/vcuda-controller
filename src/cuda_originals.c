@@ -82,6 +82,9 @@ CUresult cuCtxCreate_v3(CUcontext *pctx, unsigned int flags, CUdevice dev) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuCtxCreate_v3, pctx, flags, dev);
 }
 
+CUresult cuCtxCreate_v2(CUcontext *pctx, unsigned int flags, CUdevice dev) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuCtxCreate_v2, pctx, flags, dev);
+}
 
 CUresult cuCtxCreate(CUcontext *pctx, unsigned int flags, CUdevice dev) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuCtxCreate, pctx, flags, dev);
@@ -151,6 +154,11 @@ CUresult cuModuleGetFunction(CUfunction *hfunc, CUmodule hmod,
                          name);
 }
 
+CUresult cuModuleGetGlobal_v2(CUdeviceptr *dptr, size_t *bytes, CUmodule hmod,
+                              const char *name) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuModuleGetGlobal_v2, dptr, bytes,
+                         hmod, name);
+}
 
 CUresult cuModuleGetGlobal(CUdeviceptr *dptr, size_t *bytes, CUmodule hmod,
                            const char *name) {
@@ -169,6 +177,11 @@ CUresult cuModuleGetSurfRef(CUsurfref *pSurfRef, CUmodule hmod,
                          name);
 }
 
+CUresult cuLinkCreate_v2(unsigned int numOptions, CUjit_option *options,
+                         void **optionValues, CUlinkState *stateOut) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuLinkCreate_v2, numOptions,
+                         options, optionValues, stateOut);
+}
 
 CUresult cuLinkCreate(unsigned int numOptions, CUjit_option *options,
                       void **optionValues, CUlinkState *stateOut) {
@@ -176,6 +189,13 @@ CUresult cuLinkCreate(unsigned int numOptions, CUjit_option *options,
                          optionValues, stateOut);
 }
 
+CUresult cuLinkAddData_v2(CUlinkState state, CUjitInputType type, void *data,
+                          size_t size, const char *name,
+                          unsigned int numOptions, CUjit_option *options,
+                          void **optionValues) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuLinkAddData_v2, state, type,
+                         data, size, name, numOptions, options, optionValues);
+}
 
 CUresult cuLinkAddData(CUlinkState state, CUjitInputType type, void *data,
                        size_t size, const char *name, unsigned int numOptions,
@@ -184,6 +204,12 @@ CUresult cuLinkAddData(CUlinkState state, CUjitInputType type, void *data,
                          size, name, numOptions, options, optionValues);
 }
 
+CUresult cuLinkAddFile_v2(CUlinkState state, CUjitInputType type,
+                          const char *path, unsigned int numOptions,
+                          CUjit_option *options, void **optionValues) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuLinkAddFile_v2, state, type,
+                         path, numOptions, options, optionValues);
+}
 
 CUresult cuLinkAddFile(CUlinkState state, CUjitInputType type, const char *path,
                        unsigned int numOptions, CUjit_option *options,
@@ -201,9 +227,18 @@ CUresult cuLinkDestroy(CUlinkState state) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuLinkDestroy, state);
 }
 
+CUresult cuMemFree_v2(CUdeviceptr dptr) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemFree_v2, dptr);
+}
 
 CUresult cuMemFree(CUdeviceptr dptr) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemFree, dptr);
+}
+
+CUresult cuMemGetAddressRange_v2(CUdeviceptr *pbase, size_t *psize,
+                                 CUdeviceptr dptr) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemGetAddressRange_v2, pbase,
+                         psize, dptr);
 }
 
 CUresult cuMemGetAddressRange(CUdeviceptr *pbase, size_t *psize,
@@ -221,6 +256,11 @@ CUresult cuMemHostAlloc(void **pp, size_t bytesize, unsigned int Flags) {
                          Flags);
 }
 
+CUresult cuMemHostGetDevicePointer_v2(CUdeviceptr *pdptr, void *p,
+                                      unsigned int Flags) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemHostGetDevicePointer_v2,
+                         pdptr, p, Flags);
+}
 
 CUresult cuMemHostGetDevicePointer(CUdeviceptr *pdptr, void *p,
                                    unsigned int Flags) {
@@ -232,6 +272,10 @@ CUresult cuMemHostGetFlags(unsigned int *pFlags, void *p) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemHostGetFlags, pFlags, p);
 }
 
+CUresult cuMemHostRegister_v2(void *p, size_t bytesize, unsigned int Flags) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemHostRegister_v2, p, bytesize,
+                         Flags);
+}
 
 CUresult cuMemHostRegister(void *p, size_t bytesize, unsigned int Flags) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemHostRegister, p, bytesize,
@@ -310,6 +354,12 @@ CUresult cuMemcpyHtoD_v2_ptds(CUdeviceptr dstDevice, const void *srcHost,
                          srcHost, ByteCount);
 }
 
+CUresult cuMemcpyHtoD_v2(CUdeviceptr dstDevice, const void *srcHost,
+                         size_t ByteCount) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpyHtoD_v2, dstDevice,
+                         srcHost, ByteCount);
+}
+
 CUresult cuMemcpyHtoD(CUdeviceptr dstDevice, const void *srcHost,
                       size_t ByteCount) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpyHtoD, dstDevice, srcHost,
@@ -322,6 +372,11 @@ CUresult cuMemcpyHtoDAsync_v2_ptsz(CUdeviceptr dstDevice, const void *srcHost,
                          dstDevice, srcHost, ByteCount, hStream);
 }
 
+CUresult cuMemcpyHtoDAsync_v2(CUdeviceptr dstDevice, const void *srcHost,
+                              size_t ByteCount, CUstream hStream) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpyHtoDAsync_v2, dstDevice,
+                         srcHost, ByteCount, hStream);
+}
 
 CUresult cuMemcpyHtoDAsync(CUdeviceptr dstDevice, const void *srcHost,
                            size_t ByteCount, CUstream hStream) {
@@ -405,6 +460,9 @@ CUresult cuMemcpy2DUnaligned_v2_ptds(const CUDA_MEMCPY2D *pCopy) {
                          pCopy);
 }
 
+CUresult cuMemcpy2DUnaligned_v2(const CUDA_MEMCPY2D *pCopy) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpy2DUnaligned_v2, pCopy);
+}
 
 CUresult cuMemcpy2DUnaligned(const CUDA_MEMCPY2D *pCopy) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpy2DUnaligned, pCopy);
@@ -415,6 +473,10 @@ CUresult cuMemcpy2DAsync_v2_ptsz(const CUDA_MEMCPY2D *pCopy, CUstream hStream) {
                          hStream);
 }
 
+CUresult cuMemcpy2DAsync_v2(const CUDA_MEMCPY2D *pCopy, CUstream hStream) {
+  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpy2DAsync_v2, pCopy,
+                         hStream);
+}
 
 CUresult cuMemcpy2DAsync(const CUDA_MEMCPY2D *pCopy, CUstream hStream) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpy2DAsync, pCopy, hStream);
@@ -2838,49 +2900,49 @@ CUresult  cuMipmappedArrayGetMemoryRequirements(CUDA_ARRAY_MEMORY_REQUIREMENTS *
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMipmappedArrayGetMemoryRequirements, memoryRequirements, mipmap, device);
 }
 
-CUresult CUDAAPI cuStreamWaitValue32_v2(CUstream stream, CUdeviceptr addr, cuuint32_t value, unsigned int flags){
+CUresult  cuStreamWaitValue32_v2(CUstream stream, CUdeviceptr addr, cuuint32_t value, unsigned int flags){
   return CUDA_ENTRY_CALL(cuda_library_entry, cuStreamWaitValue32_v2, stream, addr, value, flags);
 }
-CUresult CUDAAPI cuStreamWaitValue64_v2(CUstream stream, CUdeviceptr addr, cuuint64_t value, unsigned int flags){
+CUresult  cuStreamWaitValue64_v2(CUstream stream, CUdeviceptr addr, cuuint64_t value, unsigned int flags){
   return CUDA_ENTRY_CALL(cuda_library_entry, cuStreamWaitValue64_v2, stream, addr, value, flags);
 }
-CUresult CUDAAPI cuStreamWriteValue32_v2(CUstream stream, CUdeviceptr addr, cuuint32_t value, unsigned int flags){
+CUresult  cuStreamWriteValue32_v2(CUstream stream, CUdeviceptr addr, cuuint32_t value, unsigned int flags){
   return CUDA_ENTRY_CALL(cuda_library_entry, cuStreamWriteValue32_v2, stream, addr, value, flags);
 }
-CUresult CUDAAPI cuStreamWriteValue64_v2(CUstream stream, CUdeviceptr addr, cuuint64_t value, unsigned int flags){
+CUresult  cuStreamWriteValue64_v2(CUstream stream, CUdeviceptr addr, cuuint64_t value, unsigned int flags){
   return CUDA_ENTRY_CALL(cuda_library_entry, cuStreamWriteValue64_v2, stream, addr, value, flags);
 }
-CUresult CUDAAPI cuStreamBatchMemOp_v2(CUstream stream, unsigned int count, CUstreamBatchMemOpParams *paramArray, unsigned int flags){
+CUresult  cuStreamBatchMemOp_v2(CUstream stream, unsigned int count, CUstreamBatchMemOpParams *paramArray, unsigned int flags){
   return CUDA_ENTRY_CALL(cuda_library_entry, cuStreamBatchMemOp_v2, stream, count, paramArray, flags);
 }
 
-CUresult CUDAAPI cuGraphAddBatchMemOpNode(CUgraphNode *phGraphNode, CUgraph hGraph, const CUgraphNode *dependencies, size_t numDependencies, const CUDA_BATCH_MEM_OP_NODE_PARAMS *nodeParams){
+CUresult  cuGraphAddBatchMemOpNode(CUgraphNode *phGraphNode, CUgraph hGraph, const CUgraphNode *dependencies, size_t numDependencies, const CUDA_BATCH_MEM_OP_NODE_PARAMS *nodeParams){
   return CUDA_ENTRY_CALL(cuda_library_entry, cuGraphAddBatchMemOpNode, phGraphNode, hGraph, dependencies, numDependencies, nodeParams);
 }
-CUresult CUDAAPI cuGraphBatchMemOpNodeGetParams(CUgraphNode hNode, CUDA_BATCH_MEM_OP_NODE_PARAMS *nodeParams_out){
+CUresult  cuGraphBatchMemOpNodeGetParams(CUgraphNode hNode, CUDA_BATCH_MEM_OP_NODE_PARAMS *nodeParams_out){
   return CUDA_ENTRY_CALL(cuda_library_entry, cuGraphBatchMemOpNodeGetParams, hNode, nodeParams_out);
 }
-CUresult CUDAAPI cuGraphBatchMemOpNodeSetParams(CUgraphNode hNode, const CUDA_BATCH_MEM_OP_NODE_PARAMS *nodeParams){
+CUresult  cuGraphBatchMemOpNodeSetParams(CUgraphNode hNode, const CUDA_BATCH_MEM_OP_NODE_PARAMS *nodeParams){
   return CUDA_ENTRY_CALL(cuda_library_entry, cuGraphBatchMemOpNodeSetParams, hNode, nodeParams);
 }
 
-CUresult CUDAAPI cuGraphExecBatchMemOpNodeSetParams(CUgraphExec hGraphExec, CUgraphNode hNode, const CUDA_BATCH_MEM_OP_NODE_PARAMS *nodeParams){
+CUresult  cuGraphExecBatchMemOpNodeSetParams(CUgraphExec hGraphExec, CUgraphNode hNode, const CUDA_BATCH_MEM_OP_NODE_PARAMS *nodeParams){
   return CUDA_ENTRY_CALL(cuda_library_entry, cuGraphExecBatchMemOpNodeSetParams, hGraphExec, hNode, nodeParams);
 }
 
-CUresult CUDAAPI cuGraphNodeGetEnabled(CUgraphExec hGraphExec, CUgraphNode hNode, unsigned int *isEnabled){
+CUresult  cuGraphNodeGetEnabled(CUgraphExec hGraphExec, CUgraphNode hNode, unsigned int *isEnabled){
   return CUDA_ENTRY_CALL(cuda_library_entry, cuGraphNodeGetEnabled, hGraphExec, hNode, isEnabled);
 }
 
-CUresult CUDAAPI cuGraphNodeSetEnabled(CUgraphExec hGraphExec, CUgraphNode hNode, unsigned int isEnabled){
+CUresult  cuGraphNodeSetEnabled(CUgraphExec hGraphExec, CUgraphNode hNode, unsigned int isEnabled){
   return CUDA_ENTRY_CALL(cuda_library_entry, cuGraphNodeSetEnabled, hGraphExec, hNode, isEnabled);
 }
 
 
-CUresult CUDAAPI cuModuleGetLoadingMode(CUmoduleLoadingMode *mode){
+CUresult  cuModuleGetLoadingMode(CUmoduleLoadingMode *mode){
   return CUDA_ENTRY_CALL(cuda_library_entry, cuModuleGetLoadingMode, mode);
 }
 
-CUresult CUDAAPI cuMemGetHandleForAddressRange(void *handle, CUdeviceptr dptr, size_t size, CUmemRangeHandleType handleType, unsigned long long flags){
+CUresult  cuMemGetHandleForAddressRange(void *handle, CUdeviceptr dptr, size_t size, CUmemRangeHandleType handleType, unsigned long long flags){
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemGetHandleForAddressRange, handle, dptr, size, handleType, flags);
 }
