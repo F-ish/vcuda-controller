@@ -89,8 +89,6 @@ typedef enum {
   CUDA_ENTRY_ENUM(cuDevicePrimaryCtxGetState),
   /** cuDevicePrimaryCtxReset */
   CUDA_ENTRY_ENUM(cuDevicePrimaryCtxReset),
-  /** cuCtxCreate_v2 */
-  CUDA_ENTRY_ENUM(cuCtxCreate_v2),
   /** cuCtxGetFlags */
   CUDA_ENTRY_ENUM(cuCtxGetFlags),
   /** cuCtxSetCurrent */
@@ -129,8 +127,6 @@ typedef enum {
   CUDA_ENTRY_ENUM(cuModuleUnload),
   /** cuModuleGetFunction */
   CUDA_ENTRY_ENUM(cuModuleGetFunction),
-  /** cuModuleGetGlobal_v2 */
-  CUDA_ENTRY_ENUM(cuModuleGetGlobal_v2),
   /** cuModuleGetTexRef */
   CUDA_ENTRY_ENUM(cuModuleGetTexRef),
   /** cuModuleGetSurfRef */
@@ -1102,6 +1098,22 @@ typedef enum {
   CUDA_ENTRY_ENUM(cuUserObjectCreate),
   CUDA_ENTRY_ENUM(cuUserObjectRelease),
   CUDA_ENTRY_ENUM(cuUserObjectRetain),
+  CUDA_ENTRY_ENUM(cuArrayGetMemoryRequirements),
+  CUDA_ENTRY_ENUM(cuMipmappedArrayGetMemoryRequirements),
+  CUDA_ENTRY_ENUM(cuStreamWaitValue32_v2),
+  CUDA_ENTRY_ENUM(cuStreamWaitValue64_v2),
+  CUDA_ENTRY_ENUM(cuStreamWriteValue32_v2),
+  CUDA_ENTRY_ENUM(cuStreamWriteValue64_v2),
+  CUDA_ENTRY_ENUM(cuStreamBatchMemOp_v2),
+  CUDA_ENTRY_ENUM(cuGraphAddBatchMemOpNode),
+  CUDA_ENTRY_ENUM(cuGraphBatchMemOpNodeGetParams),
+  CUDA_ENTRY_ENUM(cuGraphBatchMemOpNodeSetParams),
+  CUDA_ENTRY_ENUM(cuGraphExecBatchMemOpNodeSetParams),
+  CUDA_ENTRY_ENUM(cuGraphNodeGetEnabled),
+  CUDA_ENTRY_ENUM(cuGraphNodeSetEnabled),
+  CUDA_ENTRY_ENUM(cuModuleGetLoadingMode),
+  CUDA_ENTRY_ENUM(cuMemGetHandleForAddressRange),
+
   CUDA_ENTRY_END
 } cuda_entry_enum_t;
 
