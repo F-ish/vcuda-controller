@@ -169,11 +169,6 @@ CUresult cuModuleGetSurfRef(CUsurfref *pSurfRef, CUmodule hmod,
                          name);
 }
 
-CUresult cuLinkCreate_v2(unsigned int numOptions, CUjit_option *options,
-                         void **optionValues, CUlinkState *stateOut) {
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuLinkCreate_v2, numOptions,
-                         options, optionValues, stateOut);
-}
 
 CUresult cuLinkCreate(unsigned int numOptions, CUjit_option *options,
                       void **optionValues, CUlinkState *stateOut) {
@@ -181,13 +176,6 @@ CUresult cuLinkCreate(unsigned int numOptions, CUjit_option *options,
                          optionValues, stateOut);
 }
 
-CUresult cuLinkAddData_v2(CUlinkState state, CUjitInputType type, void *data,
-                          size_t size, const char *name,
-                          unsigned int numOptions, CUjit_option *options,
-                          void **optionValues) {
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuLinkAddData_v2, state, type,
-                         data, size, name, numOptions, options, optionValues);
-}
 
 CUresult cuLinkAddData(CUlinkState state, CUjitInputType type, void *data,
                        size_t size, const char *name, unsigned int numOptions,
@@ -196,12 +184,6 @@ CUresult cuLinkAddData(CUlinkState state, CUjitInputType type, void *data,
                          size, name, numOptions, options, optionValues);
 }
 
-CUresult cuLinkAddFile_v2(CUlinkState state, CUjitInputType type,
-                          const char *path, unsigned int numOptions,
-                          CUjit_option *options, void **optionValues) {
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuLinkAddFile_v2, state, type,
-                         path, numOptions, options, optionValues);
-}
 
 CUresult cuLinkAddFile(CUlinkState state, CUjitInputType type, const char *path,
                        unsigned int numOptions, CUjit_option *options,
@@ -219,18 +201,9 @@ CUresult cuLinkDestroy(CUlinkState state) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuLinkDestroy, state);
 }
 
-CUresult cuMemFree_v2(CUdeviceptr dptr) {
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemFree_v2, dptr);
-}
 
 CUresult cuMemFree(CUdeviceptr dptr) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemFree, dptr);
-}
-
-CUresult cuMemGetAddressRange_v2(CUdeviceptr *pbase, size_t *psize,
-                                 CUdeviceptr dptr) {
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemGetAddressRange_v2, pbase,
-                         psize, dptr);
 }
 
 CUresult cuMemGetAddressRange(CUdeviceptr *pbase, size_t *psize,
@@ -248,11 +221,6 @@ CUresult cuMemHostAlloc(void **pp, size_t bytesize, unsigned int Flags) {
                          Flags);
 }
 
-CUresult cuMemHostGetDevicePointer_v2(CUdeviceptr *pdptr, void *p,
-                                      unsigned int Flags) {
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemHostGetDevicePointer_v2,
-                         pdptr, p, Flags);
-}
 
 CUresult cuMemHostGetDevicePointer(CUdeviceptr *pdptr, void *p,
                                    unsigned int Flags) {
@@ -264,10 +232,6 @@ CUresult cuMemHostGetFlags(unsigned int *pFlags, void *p) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemHostGetFlags, pFlags, p);
 }
 
-CUresult cuMemHostRegister_v2(void *p, size_t bytesize, unsigned int Flags) {
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemHostRegister_v2, p, bytesize,
-                         Flags);
-}
 
 CUresult cuMemHostRegister(void *p, size_t bytesize, unsigned int Flags) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemHostRegister, p, bytesize,
@@ -346,12 +310,6 @@ CUresult cuMemcpyHtoD_v2_ptds(CUdeviceptr dstDevice, const void *srcHost,
                          srcHost, ByteCount);
 }
 
-CUresult cuMemcpyHtoD_v2(CUdeviceptr dstDevice, const void *srcHost,
-                         size_t ByteCount) {
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpyHtoD_v2, dstDevice,
-                         srcHost, ByteCount);
-}
-
 CUresult cuMemcpyHtoD(CUdeviceptr dstDevice, const void *srcHost,
                       size_t ByteCount) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpyHtoD, dstDevice, srcHost,
@@ -364,11 +322,6 @@ CUresult cuMemcpyHtoDAsync_v2_ptsz(CUdeviceptr dstDevice, const void *srcHost,
                          dstDevice, srcHost, ByteCount, hStream);
 }
 
-CUresult cuMemcpyHtoDAsync_v2(CUdeviceptr dstDevice, const void *srcHost,
-                              size_t ByteCount, CUstream hStream) {
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpyHtoDAsync_v2, dstDevice,
-                         srcHost, ByteCount, hStream);
-}
 
 CUresult cuMemcpyHtoDAsync(CUdeviceptr dstDevice, const void *srcHost,
                            size_t ByteCount, CUstream hStream) {
@@ -452,9 +405,6 @@ CUresult cuMemcpy2DUnaligned_v2_ptds(const CUDA_MEMCPY2D *pCopy) {
                          pCopy);
 }
 
-CUresult cuMemcpy2DUnaligned_v2(const CUDA_MEMCPY2D *pCopy) {
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpy2DUnaligned_v2, pCopy);
-}
 
 CUresult cuMemcpy2DUnaligned(const CUDA_MEMCPY2D *pCopy) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpy2DUnaligned, pCopy);
@@ -465,10 +415,6 @@ CUresult cuMemcpy2DAsync_v2_ptsz(const CUDA_MEMCPY2D *pCopy, CUstream hStream) {
                          hStream);
 }
 
-CUresult cuMemcpy2DAsync_v2(const CUDA_MEMCPY2D *pCopy, CUstream hStream) {
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpy2DAsync_v2, pCopy,
-                         hStream);
-}
 
 CUresult cuMemcpy2DAsync(const CUDA_MEMCPY2D *pCopy, CUstream hStream) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemcpy2DAsync, pCopy, hStream);
