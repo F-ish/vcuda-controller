@@ -188,6 +188,8 @@ typedef enum {
   NVML_ENTRY_ENUM(nvmlDeviceGetMemoryErrorCounter),
   /** nvmlDeviceGetMemoryInfo */
   NVML_ENTRY_ENUM(nvmlDeviceGetMemoryInfo),
+  /** nvmlDeviceGetMemoryInfo_v2 */
+  NVML_ENTRY_ENUM(nvmlDeviceGetMemoryInfo_v2),
   /** nvmlDeviceGetMinorNumber */
   NVML_ENTRY_ENUM(nvmlDeviceGetMinorNumber),
   /** nvmlDeviceGetMPSComputeRunningProcesses */

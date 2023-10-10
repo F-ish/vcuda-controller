@@ -501,6 +501,11 @@ nvmlReturn_t nvmlDeviceGetMemoryInfo(nvmlDevice_t device,
                          memory);
 }
 
+nvmlReturn_t nvmlDeviceGetMemoryInfo_v2(nvmlDevice_t device, nvmlMemory_v2_t *memory) {
+    return NVML_ENTRY_CALL(nvml_library_entry, nvmlDeviceGetMemoryInfo_v2, device, memory);
+}
+
+
 nvmlReturn_t nvmlDeviceGetMinorNumber(nvmlDevice_t device,
                                       unsigned int *minorNumber) {
   return NVML_ENTRY_CALL(nvml_library_entry, nvmlDeviceGetMinorNumber, device,

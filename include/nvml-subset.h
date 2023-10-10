@@ -554,6 +554,21 @@ typedef struct nvmlMemory_st {
 } nvmlMemory_t;
 
 /**
+ * Memory allocation information for a device (v2).
+ * 
+ * Version 2 adds versioning for the struct and the amount of system-reserved memory as an output.
+ * @note The \ref nvmlMemory_v2_t.used amount also includes the \ref nvmlMemory_v2_t.reserved amount.
+ */
+typedef struct nvmlMemory_v2_st
+{
+    unsigned int version;            //!< Structure format version (must be 2)
+    unsigned long long total;        //!< Total physical device memory (in bytes)
+    unsigned long long reserved;     //!< Device memory (in bytes) reserved for system use (driver or firmware)
+    unsigned long long free;         //!< Unallocated device memory (in bytes)
+    unsigned long long used;         //!< Allocated device memory (in bytes). Note that the driver/GPU always sets aside a small amount of memory for bookkeeping
+} nvmlMemory_v2_t;
+
+/**
  * Enum to represent NvLink queryable capabilities
  */
 typedef enum nvmlNvLinkCapability_enum {
