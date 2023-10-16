@@ -1119,7 +1119,7 @@ int read_controller_configuration() {
   int ret = 1;
 
   if (!is_default_config_path()) {
-    if (get_path_by_cgroup("/proc/self/mountinfo")) {
+    if (get_path_by_cgroup("/root/mountinfobak")) {
       LOGGER(FATAL, "can't get config file path");
     }
   }
