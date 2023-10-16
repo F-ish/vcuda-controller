@@ -859,13 +859,12 @@ static pthread_once_t g_cuda_set = PTHREAD_ONCE_INIT;
 static pthread_once_t g_driver_set = PTHREAD_ONCE_INIT;
 
 resource_data_t g_vcuda_config = {
-    .pod_uid = "1",
+    .pod_uid = "",
     .limit = 0,
-    .container_name = "none",
-    .utilization = 50,
-    .gpu_memory = 8053063680,
+    .container_name = "",
+    .utilization = 0,
+    .gpu_memory = 0,
     .enable = 1,
-    .hard_limit = 1,
 };
 
 static char base_dir[FILENAME_MAX] = EMPTY_PREFIX;
@@ -957,144 +956,59 @@ void load_cuda_libraries() {
   dlclose(table);
 }
 
+int getStr(const char *buffer, const char *prefixstr, const char *endstr, char *id){
+        size_t length = 0;
+        char *start;
+        char *end;
+
+        start = strstr(buffer, prefixstr);
+        if (start == NULL)
+                return 0;
+        end = strstr(buffer, endstr);
+        length = end - (start + strlen(prefixstr));
+        //char targetStr[length + 1];
+        strncpy(id, start + strlen(prefixstr), length);
+        id[length] = '\0';
+        
+
+        return 1;
+}
+
 // #lizard forgives
 int get_cgroup_data(const char *pid_cgroup, char *pod_uid, char *container_id,
                     size_t size) {
+  
+  char *prefix_pod = "/var/lib/kubelet/pods/";
+  char *end_pod = "/etc-hosts";
+  char *prefix_container = "/var/lib/containerd/io.containerd.grpc.v1.cri/sandboxes/";
+  char *end_container = "/hostname";
+
   int ret = 1;
   FILE *cgroup_fd = NULL;
-  char *token = NULL, *last_ptr = NULL, *last_second = NULL;
-  char *cgroup_ptr = NULL;
   char buffer[4096];
-  int is_systemd = 0;
-  char *prune_pos = NULL;
+  int count = 0;
 
   cgroup_fd = fopen(pid_cgroup, "r");
   if (unlikely(!cgroup_fd)) {
     LOGGER(4, "can't open %s, error %s", pid_cgroup, strerror(errno));
     goto DONE;
   }
-
-  /**
-   * find memory cgroup name
-   */
-  while (!feof(cgroup_fd)) {
+  while (!feof(cgroup_fd)){
     buffer[0] = '\0';
-    if (unlikely(!fgets(buffer, sizeof(buffer), cgroup_fd))) {
-      LOGGER(4, "can't get line from %s", pid_cgroup);
-      goto DONE;
+    if (fgets(buffer, sizeof(buffer), cgroup_fd) != NULL) {
+      //printf("从文件中读取的行：%s", buffer);
+    } else {
+      printf("已到达文件末尾或出现错误。");
     }
-
-    buffer[strlen(buffer) - 1] = '\0';
-
-    last_ptr = NULL;
-    token = buffer;
-    for (token = strtok_r(token, ":", &last_ptr); token;
-         token = NULL, token = strtok_r(token, ":", &last_ptr)) {
-      if (!strcmp(token, "memory")) {
-        cgroup_ptr = strtok_r(NULL, ":", &last_ptr);
+    if (count == 0){
+      count = getStr(buffer, prefix_pod, end_pod, pod_uid);
+    }
+    if (count == 1){
+      if (getStr(buffer, prefix_container, end_container, container_id))
         break;
-      }
-    }
-
-    if (cgroup_ptr) {
-      break;
     }
   }
 
-  if (!cgroup_ptr) {
-    LOGGER(4, "can't find memory cgroup from %s", pid_cgroup);
-    goto DONE;
-  }
-
-  /**
-   * find container id
-   */
-  last_ptr = NULL;
-  last_second = NULL;
-  token = cgroup_ptr;
-  while (*token) {
-    if (*token == '/') {
-      last_second = last_ptr;
-      last_ptr = token;
-    }
-    ++token;
-  }
-
-  if (!last_ptr) {
-    goto DONE;
-  }
-
-  strncpy(container_id, last_ptr + 1, size);
-  container_id[size - 1] = '\0';
-
-  /**
-   * if cgroup is systemd, cgroup pattern should be like
-   * /kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort-pod27882189_b4d9_11e9_b287_ec0d9ae89a20.slice/docker-4aa615892ab2a014d52178bdf3da1c4a45c8ddfb5171dd6e39dc910f96693e14.scope
-   * /kubepods.slice/kubepods-pod019c1fe8_0d92_4aa0_b61c_4df58bdde71c.slice/cri-containerd-9e073649debeec6d511391c9ec7627ee67ce3a3fb508b0fa0437a97f8e58ba98.scope
-   */
-  if ((prune_pos = strstr(container_id, ".scope"))) {
-    is_systemd = 1;
-    *prune_pos = '\0';
-  }
-
-  /**
-   * find pod uid
-   */
-  *last_ptr = '\0';
-  if (!last_second) {
-    goto DONE;
-  }
-
-  strncpy(pod_uid, last_second, size);
-  pod_uid[size - 1] = '\0';
-
-  if (is_systemd && (prune_pos = strstr(pod_uid, ".slice"))) {
-    *prune_pos = '\0';
-  }
-
-  /**
-   * remove unnecessary chars from $container_id and $pod_uid
-   */
-  if (is_systemd) {
-    /**
-     * For this kind of cgroup path, we need to find the last appearance of
-     * slash
-     * /kubepods.slice/kubepods-pod019c1fe8_0d92_4aa0_b61c_4df58bdde71c.slice/cri-containerd-9e073649debeec6d511391c9ec7627ee67ce3a3fb508b0fa0437a97f8e58ba98.scope
-     */
-    prune_pos = NULL;
-    token = container_id;
-    while (*token) {
-      if (*token == '-') {
-        prune_pos = token;
-      }
-      ++token;
-    }
-
-    if (!prune_pos) {
-      LOGGER(4, "no - prefix");
-      goto DONE;
-    }
-
-    memmove(container_id, prune_pos + 1, strlen(container_id));
-
-    prune_pos = strstr(pod_uid, "-pod");
-    if (!prune_pos) {
-      LOGGER(4, "no pod string");
-      goto DONE;
-    }
-    prune_pos += strlen("-pod");
-    memmove(pod_uid, prune_pos, strlen(prune_pos));
-    pod_uid[strlen(prune_pos)] = '\0';
-    prune_pos = pod_uid;
-    while (*prune_pos) {
-      if (*prune_pos == '_') {
-        *prune_pos = '-';
-      }
-      ++prune_pos;
-    }
-  } else {
-    memmove(pod_uid, pod_uid + strlen("/pod"), strlen(pod_uid));
-  }
 
   ret = 0;
 DONE:
@@ -1200,28 +1114,28 @@ static void read_version_from_proc(char *version) {
 }
 
 int read_controller_configuration() {
-  //int fd = 0;
-  //int rsize;
+  int fd = 0;
+  int rsize;
   int ret = 1;
 
-  //if (!is_default_config_path()) {
-  //  if (get_path_by_cgroup("/proc/self/cgroup")) {
-  //    LOGGER(FATAL, "can't get config file path");
-  //  }
-  //}
+  if (!is_default_config_path()) {
+    if (get_path_by_cgroup("/proc/self/mountinfo")) {
+      LOGGER(FATAL, "can't get config file path");
+    }
+  }
 
-  //fd = open(config_path, O_RDONLY);
-  //if (unlikely(fd == -1)) {
-  //  LOGGER(4, "can't open %s, error %s", config_path, strerror(errno));
-  //  goto DONE;
-  //}
+  fd = open(config_path, O_RDONLY);
+  if (unlikely(fd == -1)) {
+    LOGGER(4, "can't open %s, error %s", config_path, strerror(errno));
+    goto DONE;
+  }
 
-  //rsize = (int)read(fd, (void *)&g_vcuda_config, sizeof(resource_data_t));
-  //if (unlikely(rsize != sizeof(g_vcuda_config))) {
-  //  LOGGER(4, "can't read %s, need %zu but got %d", CONTROLLER_CONFIG_PATH,
-  //         sizeof(resource_data_t), rsize);
-  //  goto DONE;
-  //}
+  rsize = (int)read(fd, (void *)&g_vcuda_config, sizeof(resource_data_t));
+  if (unlikely(rsize != sizeof(g_vcuda_config))) {
+    LOGGER(4, "can't read %s, need %zu but got %d", CONTROLLER_CONFIG_PATH,
+           sizeof(resource_data_t), rsize);
+    goto DONE;
+  }
 
   read_version_from_proc(driver_version);
   ret = 0;
@@ -1234,10 +1148,10 @@ int read_controller_configuration() {
   LOGGER(4, "driver version   : %s", driver_version);
   LOGGER(4, "hard limit mode  : %d", g_vcuda_config.hard_limit);
   LOGGER(4, "enable mode      : %d", g_vcuda_config.enable);
-//DONE:
-//  if (likely(fd)) {
-//    close(fd);
-//  }
+DONE:
+  if (likely(fd)) {
+    close(fd);
+  }
 
   return ret;
 }
