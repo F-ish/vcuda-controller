@@ -1,9 +1,9 @@
 # stage 1
-FROM nvidia/cuda:11.2.2-devel-ubuntu18.04 as build
+FROM nvidia/cuda:11.5.1-devel-ubuntu18.04 as build
 
 
-RUN gpg --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC && \
-    gpg --export --armor A4B469963BF863CC | apt-key add -
+#RUN gpg --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC && \
+#    gpg --export --armor A4B469963BF863CC | apt-key add -
 RUN apt update && apt install -y --no-install-recommends \
   curl
 

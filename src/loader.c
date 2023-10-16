@@ -859,12 +859,13 @@ static pthread_once_t g_cuda_set = PTHREAD_ONCE_INIT;
 static pthread_once_t g_driver_set = PTHREAD_ONCE_INIT;
 
 resource_data_t g_vcuda_config = {
-    .pod_uid = "",
+    .pod_uid = "1",
     .limit = 0,
-    .container_name = "",
-    .utilization = 0,
-    .gpu_memory = 0,
+    .container_name = "none",
+    .utilization = 50,
+    .gpu_memory = 8053063680,
     .enable = 1,
+    .hard_limit = 1,
 };
 
 static char base_dir[FILENAME_MAX] = EMPTY_PREFIX;
@@ -1203,24 +1204,24 @@ int read_controller_configuration() {
   int rsize;
   int ret = 1;
 
-  if (!is_default_config_path()) {
-    if (get_path_by_cgroup("/proc/self/cgroup")) {
-      LOGGER(FATAL, "can't get config file path");
-    }
-  }
+  //if (!is_default_config_path()) {
+  //  if (get_path_by_cgroup("/proc/self/cgroup")) {
+  //    LOGGER(FATAL, "can't get config file path");
+  //  }
+  //}
 
-  fd = open(config_path, O_RDONLY);
-  if (unlikely(fd == -1)) {
-    LOGGER(4, "can't open %s, error %s", config_path, strerror(errno));
-    goto DONE;
-  }
+  //fd = open(config_path, O_RDONLY);
+  //if (unlikely(fd == -1)) {
+  //  LOGGER(4, "can't open %s, error %s", config_path, strerror(errno));
+  //  goto DONE;
+  //}
 
-  rsize = (int)read(fd, (void *)&g_vcuda_config, sizeof(resource_data_t));
-  if (unlikely(rsize != sizeof(g_vcuda_config))) {
-    LOGGER(4, "can't read %s, need %zu but got %d", CONTROLLER_CONFIG_PATH,
-           sizeof(resource_data_t), rsize);
-    goto DONE;
-  }
+  //rsize = (int)read(fd, (void *)&g_vcuda_config, sizeof(resource_data_t));
+  //if (unlikely(rsize != sizeof(g_vcuda_config))) {
+  //  LOGGER(4, "can't read %s, need %zu but got %d", CONTROLLER_CONFIG_PATH,
+  //         sizeof(resource_data_t), rsize);
+  //  goto DONE;
+  //}
 
   read_version_from_proc(driver_version);
   ret = 0;
@@ -1233,10 +1234,10 @@ int read_controller_configuration() {
   LOGGER(4, "driver version   : %s", driver_version);
   LOGGER(4, "hard limit mode  : %d", g_vcuda_config.hard_limit);
   LOGGER(4, "enable mode      : %d", g_vcuda_config.enable);
-DONE:
-  if (likely(fd)) {
-    close(fd);
-  }
+//DONE:
+//  if (likely(fd)) {
+//    close(fd);
+//  }
 
   return ret;
 }
