@@ -1200,9 +1200,9 @@ static void read_version_from_proc(char *version) {
 }
 
 int read_controller_configuration() {
-  int fd = 0;
-  int rsize;
-  int ret = 1;
+  //int fd = 0;
+  //int rsize;
+  //int ret = 1;
 
   //if (!is_default_config_path()) {
   //  if (get_path_by_cgroup("/proc/self/cgroup")) {
