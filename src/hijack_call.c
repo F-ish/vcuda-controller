@@ -17,6 +17,7 @@
  */
 
 #include <errno.h>
+#include <stdio.h>
 #include <fcntl.h>
 #include <pthread.h>
 #include <stdlib.h>
@@ -684,13 +685,15 @@ CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize) {
     }
   }
  */
-		CUresult ret;
+  printf("--------------------------------hijacking cuMemAlloc_v2----------------------------------------\n");
+  CUresult ret;
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAlloc_v2, dptr, bytesize);
 //DONE:
   return ret;
 }
 
 CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize) {
+  printf("--------------------------------hijacking cuMemAlloc----------------------------------------\n");
   size_t used = 0;
   size_t request_size = bytesize;
   CUresult ret;
