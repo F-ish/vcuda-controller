@@ -694,7 +694,7 @@ CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize) {
 
 CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize) {
   printf("--------------------------------hijacking cuMemAlloc----------------------------------------\n");
-  size_t used = 0;
+  /*size_t used = 0;
   size_t request_size = bytesize;
   CUresult ret;
 
@@ -705,10 +705,11 @@ CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize) {
       ret = CUDA_ERROR_OUT_OF_MEMORY;
       goto DONE;
     }
-  }
-
+  }*/
+  CUresult ret;
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAlloc, dptr, bytesize);
-DONE:
+//DONE:
+  printf("------------------------cuerror is %d---------------------\n", ret);
   return ret;
 }
 
