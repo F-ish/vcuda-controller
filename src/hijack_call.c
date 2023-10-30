@@ -671,7 +671,7 @@ DONE:
 }
 
 CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize) {
-  size_t used = 0;
+ /* size_t used = 0;
   size_t request_size = bytesize;
   CUresult ret;
 
@@ -683,9 +683,10 @@ CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize) {
       goto DONE;
     }
   }
-
+ */
+		CUresult ret;
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAlloc_v2, dptr, bytesize);
-DONE:
+//DONE:
   return ret;
 }
 
