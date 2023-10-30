@@ -871,6 +871,7 @@ static char base_dir[FILENAME_MAX] = EMPTY_PREFIX;
 char config_path[FILENAME_MAX] = CONTROLLER_CONFIG_PATH;
 char pid_path[FILENAME_MAX] = PIDS_CONFIG_PATH;
 char driver_version[FILENAME_MAX] = "";
+int cgroupVersion = 0;
 
 static void load_driver_libraries() {
   void *table = NULL;
@@ -975,7 +976,7 @@ int getStr(const char *buffer, const char *prefixstr, const char *endstr, char *
 }
 
 // #lizard forgives
-int get_cgroup_data(const char *pid_cgroup, char *pod_uid, char *container_id,
+int get_cgroupV2_data(const char *pid_cgroup, char *pod_uid, char *container_id,
                     size_t size) {
   
   char *prefix_pod = "/var/lib/kubelet/pods/";
@@ -1018,6 +1019,152 @@ DONE:
   return ret;
 }
 
+int get_cgroup_data(const char *pid_cgroup, char *pod_uid, char *container_id,
+                    size_t size) {
+  int ret = 1;
+  FILE *cgroup_fd = NULL;
+  char *token = NULL, *last_ptr = NULL, *last_second = NULL;
+  char *cgroup_ptr = NULL;
+  char buffer[4096];
+  int is_systemd = 0;
+  char *prune_pos = NULL;
+
+  cgroup_fd = fopen(pid_cgroup, "r");
+  if (unlikely(!cgroup_fd)) {
+    LOGGER(4, "can't open %s, error %s", pid_cgroup, strerror(errno));
+    goto DONE;
+  }
+
+  /**
+   * find memory cgroup name
+   */
+  while (!feof(cgroup_fd)) {
+    buffer[0] = '\0';
+    if (unlikely(!fgets(buffer, sizeof(buffer), cgroup_fd))) {
+      LOGGER(4, "can't get line from %s", pid_cgroup);
+      goto DONE;
+    }
+
+    buffer[strlen(buffer) - 1] = '\0';
+
+    last_ptr = NULL;
+    token = buffer;
+    for (token = strtok_r(token, ":", &last_ptr); token;
+         token = NULL, token = strtok_r(token, ":", &last_ptr)) {
+      if (!strcmp(token, "memory")) {
+        cgroup_ptr = strtok_r(NULL, ":", &last_ptr);
+        break;
+      }
+    }
+
+    if (cgroup_ptr) {
+      break;
+    }
+  }
+
+  if (!cgroup_ptr) {
+    LOGGER(4, "can't find memory cgroup from %s", pid_cgroup);
+    goto DONE;
+  }
+
+  /**
+   * find container id
+   */
+  last_ptr = NULL;
+  last_second = NULL;
+  token = cgroup_ptr;
+  while (*token) {
+    if (*token == '/') {
+      last_second = last_ptr;
+      last_ptr = token;
+    }
+    ++token;
+  }
+
+  if (!last_ptr) {
+    goto DONE;
+  }
+
+  strncpy(container_id, last_ptr + 1, size);
+  container_id[size - 1] = '\0';
+
+  /**
+   * if cgroup is systemd, cgroup pattern should be like
+   * /kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort-pod27882189_b4d9_11e9_b287_ec0d9ae89a20.slice/docker-4aa615892ab2a014d52178bdf3da1c4a45c8ddfb5171dd6e39dc910f96693e14.scope
+   * /kubepods.slice/kubepods-pod019c1fe8_0d92_4aa0_b61c_4df58bdde71c.slice/cri-containerd-9e073649debeec6d511391c9ec7627ee67ce3a3fb508b0fa0437a97f8e58ba98.scope
+   */
+  if ((prune_pos = strstr(container_id, ".scope"))) {
+    is_systemd = 1;
+    *prune_pos = '\0';
+  }
+
+  /**
+   * find pod uid
+   */
+  *last_ptr = '\0';
+  if (!last_second) {
+    goto DONE;
+  }
+
+  strncpy(pod_uid, last_second, size);
+  pod_uid[size - 1] = '\0';
+
+  if (is_systemd && (prune_pos = strstr(pod_uid, ".slice"))) {
+    *prune_pos = '\0';
+  }
+
+  /**
+   * remove unnecessary chars from $container_id and $pod_uid
+   */
+  if (is_systemd) {
+    /**
+     * For this kind of cgroup path, we need to find the last appearance of
+     * slash
+     * /kubepods.slice/kubepods-pod019c1fe8_0d92_4aa0_b61c_4df58bdde71c.slice/cri-containerd-9e073649debeec6d511391c9ec7627ee67ce3a3fb508b0fa0437a97f8e58ba98.scope
+     */
+    prune_pos = NULL;
+    token = container_id;
+    while (*token) {
+      if (*token == '-') {
+        prune_pos = token;
+      }
+      ++token;
+    }
+
+    if (!prune_pos) {
+      LOGGER(4, "no - prefix");
+      goto DONE;
+    }
+
+    memmove(container_id, prune_pos + 1, strlen(container_id));
+
+    prune_pos = strstr(pod_uid, "-pod");
+    if (!prune_pos) {
+      LOGGER(4, "no pod string");
+      goto DONE;
+    }
+    prune_pos += strlen("-pod");
+    memmove(pod_uid, prune_pos, strlen(prune_pos));
+    pod_uid[strlen(prune_pos)] = '\0';
+    prune_pos = pod_uid;
+    while (*prune_pos) {
+      if (*prune_pos == '_') {
+        *prune_pos = '-';
+      }
+      ++prune_pos;
+    }
+  } else {
+    memmove(pod_uid, pod_uid + strlen("/pod"), strlen(pod_uid));
+  }
+
+  ret = 0;
+DONE:
+  if (cgroup_fd) {
+    fclose(cgroup_fd);
+  }
+  return ret;
+}
+
 static int get_path_by_cgroup(const char *pid_cgroup) {
   int ret = 1;
   char pod_uid[4096], container_id[4096];
@@ -1026,10 +1173,19 @@ static int get_path_by_cgroup(const char *pid_cgroup) {
     return 0;
   }
 
-  if (unlikely(get_cgroup_data(pid_cgroup, pod_uid, container_id,
+  if (cgroupVersion){
+    if (unlikely(get_cgroupV2_data(pid_cgroup, pod_uid, container_id,
                                sizeof(container_id)))) {
     LOGGER(4, "can't find container id from %s", pid_cgroup);
     goto DONE;
+    }
+  }
+  else{
+    if (unlikely(get_cgroup_data(pid_cgroup, pod_uid, container_id,
+                               sizeof(container_id)))) {
+    LOGGER(4, "can't find container id from %s", pid_cgroup);
+    goto DONE;
+    }
   }
 
   snprintf(base_dir, sizeof(base_dir), "%s%s", VCUDA_CONFIG_PATH, container_id);
@@ -1113,14 +1269,45 @@ static void read_version_from_proc(char *version) {
   fclose(fp);
 }
 
+int checkCgroupVersion(){
+  char *check;
+  FILE *cgroupVersion_fd = NULL;
+  char buffer[4096];
+
+  cgroupVersion_fd = fopen("/proc/filesystems", "r");
+  if (unlikely(!cgroupVersion_fd)) {
+    LOGGER(4, "can't open /proc/filesystems, error");
+  }
+  while (!feof(cgroupVersion_fd)){
+    buffer[0] = '\0';
+    if (fgets(buffer, sizeof(buffer), cgroupVersion_fd) != NULL) {
+      //printf("从文件中读取的行：%s", buffer);
+      check = strstr(buffer, "cgroup2");
+      if (check != NULL){
+         cgroupVersion = 1;
+         return 1;
+      }
+    }
+  }
+  cgroupVersion = 0;
+  return 0;
+}
+
 int read_controller_configuration() {
   int fd = 0;
   int rsize;
   int ret = 1;
 
   if (!is_default_config_path()) {
-    if (get_path_by_cgroup("/root/mountinfobak")) {
-      LOGGER(FATAL, "can't get config file path");
+    if (checkCgroupVersion()){
+      if (get_path_by_cgroup("/root/mountinfobak")) {
+        LOGGER(FATAL, "can't get config file path");
+      }
+    }
+    else{
+      if (get_path_by_cgroup("/proc/self/cgroup")) {
+        LOGGER(FATAL, "can't get config file path");
+      }
     }
   }
 
