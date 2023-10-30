@@ -1270,27 +1270,30 @@ static void read_version_from_proc(char *version) {
 }
 
 int checkCgroupVersion(){
-  char *check;
-  FILE *cgroupVersion_fd = NULL;
+  FILE *fp;
   char buffer[4096];
-
-  cgroupVersion_fd = fopen("/proc/filesystems", "r");
-  if (unlikely(!cgroupVersion_fd)) {
-    LOGGER(4, "can't open /proc/filesystems, error");
+  char *check;
+   
+   // 执行 shell 命令 "mount | grep cgroup" 并打开其输出
+  fp = popen("mount | grep cgroup", "r");
+  if (unlikely(!fp)) {
+    LOGGER(4, "popen error");
   }
-  while (!feof(cgroupVersion_fd)){
-    buffer[0] = '\0';
-    if (fgets(buffer, sizeof(buffer), cgroupVersion_fd) != NULL) {
-      //printf("从文件中读取的行：%s", buffer);
-      check = strstr(buffer, "cgroup2");
+  
+  // 读取并打印输出内容
+  while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+      check = strstr(buffer, "/sys/fs/cgroup/memory");
       if (check != NULL){
-         cgroupVersion = 1;
-         return 1;
+          cgroupVersion = 0;
+          pclose(fp);
+          return 0;
       }
-    }
   }
-  cgroupVersion = 0;
-  return 0;
+  // 关闭文件指针
+  pclose(fp);
+  cgroupVersion = 1;
+
+  return 1;
 }
 
 int read_controller_configuration() {
