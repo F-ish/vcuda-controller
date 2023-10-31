@@ -23,6 +23,7 @@
 
 #include "include/cuda-helper.h"
 #include "include/hijack.h"
+#include <stdio.h>
 
 extern entry_t cuda_library_entry[];
 
@@ -107,6 +108,7 @@ CUresult cuCtxDetach(CUcontext ctx) {
 }
 
 CUresult cuCtxGetApiVersion(CUcontext ctx, unsigned int *version) {
+  printf("----------------api version is:%d--------------------------", *version);
   return CUDA_ENTRY_CALL(cuda_library_entry, cuCtxGetApiVersion, ctx, version);
 }
 
