@@ -668,7 +668,6 @@ CUresult cuMemAllocManaged(CUdeviceptr *dptr, size_t bytesize,
     }
   } 
   printf("cuMemAllocManaged in call subseq is: %d\n", ++seq);
-  CUresult ret;
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocManaged, dptr, bytesize,
                         flags);
 DONE:
@@ -735,7 +734,7 @@ CUresult cuMemAllocPitch_v2(CUdeviceptr *dptr, size_t *pPitch,
     }
   } 
   printf("cuMemAllocPitch_v2 in call subseq is: %d\n", ++seq);
-  CUresult ret;
+  
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocPitch_v2, dptr, pPitch,
                         WidthInBytes, Height, ElementSizeBytes);
 DONE:
@@ -757,7 +756,7 @@ CUresult cuMemAllocPitch(CUdeviceptr *dptr, size_t *pPitch, size_t WidthInBytes,
     }
   } 
   printf("cuMemAllocPitch in call subseq is: %d\n", ++seq);
-  CUresult ret;
+  
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocPitch, dptr, pPitch,
                         WidthInBytes, Height, ElementSizeBytes);
 DONE:
@@ -921,7 +920,7 @@ cuMipmappedArrayCreate(CUmipmappedArray *pHandle,
     }
   } 
   printf("cuMipmappedArrayCreate in call subseq is: %d\n", ++seq);
-  CUresult ret;
+  
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMipmappedArrayCreate, pHandle,
                         pMipmappedArrayDesc, numMipmapLevels);
 DONE:
