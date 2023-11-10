@@ -101,8 +101,8 @@ CUresult cuGetProcAddress(const char *symbol, void **pfn, int cudaVersion,
                           cuuint64_t flags); 
 CUresult cuMemAllocManaged(CUdeviceptr *dptr, size_t bytesize,
                            unsigned int flags);
-CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize);
-CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize);
+//CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize);
+//CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize);
 CUresult cuMemAllocPitch_v2(CUdeviceptr *dptr, size_t *pPitch,
                             size_t WidthInBytes, size_t Height,
                             unsigned int ElementSizeBytes);
@@ -158,8 +158,8 @@ entry_t cuda_hooks_entry[] = {
     {.name = "cuInit", .fn_ptr = cuInit},
     {.name = "cuGetProcAddress", .fn_ptr = cuGetProcAddress},
     {.name = "cuMemAllocManaged", .fn_ptr = cuMemAllocManaged},
-    {.name = "cuMemAlloc_v2", .fn_ptr = cuMemAlloc_v2},
-    {.name = "cuMemAlloc", .fn_ptr = cuMemAlloc},
+    //{.name = "cuMemAlloc_v2", .fn_ptr = cuMemAlloc_v2},
+    //{.name = "cuMemAlloc", .fn_ptr = cuMemAlloc},
     {.name = "cuMemAllocPitch_v2", .fn_ptr = cuMemAllocPitch_v2},
     {.name = "cuMemAllocPitch", .fn_ptr = cuMemAllocPitch},
     {.name = "cuArrayCreate_v2", .fn_ptr = cuArrayCreate_v2},
@@ -655,7 +655,7 @@ CUresult cuGetProcAddress(const char *symbol, void **pfn, int cudaVersion,
 
 CUresult cuMemAllocManaged(CUdeviceptr *dptr, size_t bytesize,
                            unsigned int flags) {
-  /* size_t used = 0;
+   size_t used = 0;
   size_t request_size = bytesize;
   CUresult ret;
 
@@ -666,17 +666,17 @@ CUresult cuMemAllocManaged(CUdeviceptr *dptr, size_t bytesize,
       ret = CUDA_ERROR_OUT_OF_MEMORY;
       goto DONE;
     }
-  } */
+  } 
   printf("cuMemAllocManaged in call subseq is: %d\n", ++seq);
   CUresult ret;
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocManaged, dptr, bytesize,
                         flags);
-//DONE:
+DONE:
   return ret;
 }
-
+/*
 CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize) {
- /* size_t used = 0;
+  size_t used = 0;
   size_t request_size = bytesize;
   CUresult ret;
 
@@ -688,18 +688,18 @@ CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize) {
       goto DONE;
     }
   }
- */
+ 
   printf("cuMemAlloc_v2 in call subseq is: %d\n", ++seq);
   printf("--------------------------------hijacking cuMemAlloc_v2----------------------------------------\n");
   CUresult ret;
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAlloc_v2, dptr, bytesize);
-//DONE:
+DONE:
   return ret;
 }
 
 CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize) {
   printf("--------------------------------hijacking cuMemAlloc----------------------------------------\n");
-  /*size_t used = 0;
+  size_t used = 0;
   size_t request_size = bytesize;
   CUresult ret;
 
@@ -710,19 +710,19 @@ CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize) {
       ret = CUDA_ERROR_OUT_OF_MEMORY;
       goto DONE;
     }
-  }*/
+  }
   printf("cuMemAlloc in call subseq is: %d\n", ++seq);
   CUresult ret;
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAlloc, dptr, bytesize);
-//DONE:
+DONE:
   printf("------------------------cuerror is %d---------------------\n", ret);
   return ret;
 }
-
+*/
 CUresult cuMemAllocPitch_v2(CUdeviceptr *dptr, size_t *pPitch,
                             size_t WidthInBytes, size_t Height,
                             unsigned int ElementSizeBytes) {
-  /* size_t used = 0;
+   size_t used = 0;
   size_t request_size = ROUND_UP(WidthInBytes * Height, ElementSizeBytes);
   CUresult ret;
 
@@ -733,18 +733,18 @@ CUresult cuMemAllocPitch_v2(CUdeviceptr *dptr, size_t *pPitch,
       ret = CUDA_ERROR_OUT_OF_MEMORY;
       goto DONE;
     }
-  } */
+  } 
   printf("cuMemAllocPitch_v2 in call subseq is: %d\n", ++seq);
   CUresult ret;
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocPitch_v2, dptr, pPitch,
                         WidthInBytes, Height, ElementSizeBytes);
-//DONE:
+DONE:
   return ret;
 }
 
 CUresult cuMemAllocPitch(CUdeviceptr *dptr, size_t *pPitch, size_t WidthInBytes,
                          size_t Height, unsigned int ElementSizeBytes) {
-  /* size_t used = 0;
+   size_t used = 0;
   size_t request_size = ROUND_UP(WidthInBytes * Height, ElementSizeBytes);
   CUresult ret;
 
@@ -755,12 +755,12 @@ CUresult cuMemAllocPitch(CUdeviceptr *dptr, size_t *pPitch, size_t WidthInBytes,
       ret = CUDA_ERROR_OUT_OF_MEMORY;
       goto DONE;
     }
-  } */
+  } 
   printf("cuMemAllocPitch in call subseq is: %d\n", ++seq);
   CUresult ret;
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocPitch, dptr, pPitch,
                         WidthInBytes, Height, ElementSizeBytes);
-//DONE:
+DONE:
   return ret;
 }
 
@@ -817,14 +817,14 @@ CUresult cuArrayCreate_v2(CUarray *pHandle,
                           const CUDA_ARRAY_DESCRIPTOR *pAllocateArray) {
   CUresult ret;
 
-  /* ret = cuArrayCreate_helper(pAllocateArray);
+   ret = cuArrayCreate_helper(pAllocateArray);
   if (ret != CUDA_SUCCESS) {
     goto DONE;
-  } */
+  } 
   printf("cuArrayCreate_v2 in call subseq is: %d\n", ++seq);
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArrayCreate_v2, pHandle,
                         pAllocateArray);
-//DONE:
+DONE:
   return ret;
 }
 
@@ -832,14 +832,14 @@ CUresult cuArrayCreate(CUarray *pHandle,
                        const CUDA_ARRAY_DESCRIPTOR *pAllocateArray) {
   CUresult ret;
 
-  /* ret = cuArrayCreate_helper(pAllocateArray);
+   ret = cuArrayCreate_helper(pAllocateArray);
   if (ret != CUDA_SUCCESS) {
     goto DONE;
-  } */
+  } 
   printf("cuArrayCreate in call subseq is: %d\n", ++seq);
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArrayCreate, pHandle,
                         pAllocateArray);
-//DONE:
+DONE:
   return ret;
 }
 
@@ -872,14 +872,14 @@ CUresult cuArray3DCreate_v2(CUarray *pHandle,
                             const CUDA_ARRAY3D_DESCRIPTOR *pAllocateArray) {
   CUresult ret;
 
-  /* ret = cuArray3DCreate_helper(pAllocateArray);
+   ret = cuArray3DCreate_helper(pAllocateArray);
   if (ret != CUDA_SUCCESS) {
     goto DONE;
-  } */
+  } 
   printf("cuArray3DCreate_v2 in call subseq is: %d\n", ++seq);
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArray3DCreate_v2, pHandle,
                         pAllocateArray);
-//DONE:
+DONE:
   return ret;
 }
 
@@ -887,14 +887,14 @@ CUresult cuArray3DCreate(CUarray *pHandle,
                          const CUDA_ARRAY3D_DESCRIPTOR *pAllocateArray) {
   CUresult ret;
 
-  /* ret = cuArray3DCreate_helper(pAllocateArray);
+   ret = cuArray3DCreate_helper(pAllocateArray);
   if (ret != CUDA_SUCCESS) {
     goto DONE;
-  } */
+  } 
   printf("cuArray3DCreate in call subseq is: %d\n", ++seq);
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuArray3DCreate, pHandle,
                         pAllocateArray);
-//DONE:
+DONE:
   return ret;
 }
 
@@ -902,7 +902,7 @@ CUresult
 cuMipmappedArrayCreate(CUmipmappedArray *pHandle,
                        const CUDA_ARRAY3D_DESCRIPTOR *pMipmappedArrayDesc,
                        unsigned int numMipmapLevels) {
-  /* size_t used = 0;
+   size_t used = 0;
   size_t base_size = 0;
   size_t request_size = 0;
   CUresult ret;
@@ -919,37 +919,37 @@ cuMipmappedArrayCreate(CUmipmappedArray *pHandle,
       ret = CUDA_ERROR_OUT_OF_MEMORY;
       goto DONE;
     }
-  } */
+  } 
   printf("cuMipmappedArrayCreate in call subseq is: %d\n", ++seq);
   CUresult ret;
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMipmappedArrayCreate, pHandle,
                         pMipmappedArrayDesc, numMipmapLevels);
-//DONE:
+DONE:
   return ret;
 }
 
 CUresult cuDeviceTotalMem_v2(size_t *bytes, CUdevice dev) {
-  /* if (g_vcuda_config.enable) {
+   if (g_vcuda_config.enable) {
     *bytes = g_vcuda_config.gpu_memory;
 
     return CUDA_SUCCESS;
-  } */
+  } 
   printf("cuDeviceTotalMem_v2 in call subseq is: %d\n", ++seq);
   return CUDA_ENTRY_CALL(cuda_library_entry, cuDeviceTotalMem_v2, bytes, dev);
 }
 
 CUresult cuDeviceTotalMem(size_t *bytes, CUdevice dev) {
-  /* if (g_vcuda_config.enable) {
+   if (g_vcuda_config.enable) {
     *bytes = g_vcuda_config.gpu_memory;
 
     return CUDA_SUCCESS;
-  } */
+  } 
   printf("cuDeviceTotalMem in call subseq is: %d\n", ++seq);
   return CUDA_ENTRY_CALL(cuda_library_entry, cuDeviceTotalMem, bytes, dev);
 }
 
 CUresult cuMemGetInfo_v2(size_t *free, size_t *total) {
-  /* size_t used = 0;
+   size_t used = 0;
 
   if (g_vcuda_config.enable) {
     atomic_action(pid_path, get_used_gpu_memory, (void *)&used);
@@ -959,13 +959,13 @@ CUresult cuMemGetInfo_v2(size_t *free, size_t *total) {
         used > g_vcuda_config.gpu_memory ? 0 : g_vcuda_config.gpu_memory - used;
 
     return CUDA_SUCCESS;
-  } */
+  } 
   printf("cuMemGetInfo_v2 in call subseq is: %d\n", ++seq);
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemGetInfo_v2, free, total);
 }
 
 CUresult cuMemGetInfo(size_t *free, size_t *total) {
-  /* size_t used = 0;
+   size_t used = 0;
 
   if (g_vcuda_config.enable) {
     atomic_action(pid_path, get_used_gpu_memory, (void *)&used);
@@ -975,7 +975,7 @@ CUresult cuMemGetInfo(size_t *free, size_t *total) {
         used > g_vcuda_config.gpu_memory ? 0 : g_vcuda_config.gpu_memory - used;
 
     return CUDA_SUCCESS;
-  } */
+  } 
   printf("cuMemGetInfo in call subseq is: %d\n", ++seq);
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemGetInfo, free, total);
 }
@@ -986,8 +986,8 @@ CUresult cuLaunchKernel_ptsz(CUfunction f, unsigned int gridDimX,
                              unsigned int blockDimZ,
                              unsigned int sharedMemBytes, CUstream hStream,
                              void **kernelParams, void **extra) {
-  /* rate_limiter(gridDimX * gridDimY * gridDimZ,
-               blockDimX * blockDimY * blockDimZ); */
+   rate_limiter(gridDimX * gridDimY * gridDimZ,
+               blockDimX * blockDimY * blockDimZ); 
   printf("cuLaunchKernel_ptsz in call subseq is: %d\n", ++seq);
   return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchKernel_ptsz, f, gridDimX,
                          gridDimY, gridDimZ, blockDimX, blockDimY, blockDimZ,
@@ -999,8 +999,8 @@ CUresult cuLaunchKernel(CUfunction f, unsigned int gridDimX,
                         unsigned int blockDimX, unsigned int blockDimY,
                         unsigned int blockDimZ, unsigned int sharedMemBytes,
                         CUstream hStream, void **kernelParams, void **extra) {
-  /* rate_limiter(gridDimX * gridDimY * gridDimZ,
-               blockDimX * blockDimY * blockDimZ); */
+   rate_limiter(gridDimX * gridDimY * gridDimZ,
+               blockDimX * blockDimY * blockDimZ); 
   printf("cuLaunchKernel in call subseq is: %d\n", ++seq);
   return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchKernel, f, gridDimX,
                          gridDimY, gridDimZ, blockDimX, blockDimY, blockDimZ,
@@ -1008,7 +1008,7 @@ CUresult cuLaunchKernel(CUfunction f, unsigned int gridDimX,
 }
 
 CUresult cuLaunch(CUfunction f) {
-  /* rate_limiter(1, g_block_x * g_block_y * g_block_z); */
+   rate_limiter(1, g_block_x * g_block_y * g_block_z); 
   printf("cuLaunch in call subseq is: %d\n", ++seq);
   return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunch, f);
 }
@@ -1018,8 +1018,8 @@ CUresult cuLaunchCooperativeKernel_ptsz(
     unsigned int gridDimZ, unsigned int blockDimX, unsigned int blockDimY,
     unsigned int blockDimZ, unsigned int sharedMemBytes, CUstream hStream,
     void **kernelParams) {
-  /* rate_limiter(gridDimX * gridDimY * gridDimZ,
-               blockDimX * blockDimY * blockDimZ); */
+   rate_limiter(gridDimX * gridDimY * gridDimZ,
+               blockDimX * blockDimY * blockDimZ); 
   printf("cuLaunchCooperativeKernel_ptsz in call subseq is: %d\n", ++seq);
   return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchCooperativeKernel_ptsz, f,
                          gridDimX, gridDimY, gridDimZ, blockDimX, blockDimY,
@@ -1033,8 +1033,8 @@ CUresult cuLaunchCooperativeKernel(CUfunction f, unsigned int gridDimX,
                                    unsigned int blockDimZ,
                                    unsigned int sharedMemBytes,
                                    CUstream hStream, void **kernelParams) {
-  /* rate_limiter(gridDimX * gridDimY * gridDimZ,
-               blockDimX * blockDimY * blockDimZ); */
+   rate_limiter(gridDimX * gridDimY * gridDimZ,
+               blockDimX * blockDimY * blockDimZ); 
   printf("cuLaunchCooperativeKernel in call subseq is: %d\n", ++seq);
   return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchCooperativeKernel, f,
                          gridDimX, gridDimY, gridDimZ, blockDimX, blockDimY,
@@ -1042,7 +1042,7 @@ CUresult cuLaunchCooperativeKernel(CUfunction f, unsigned int gridDimX,
 }
 
 CUresult cuLaunchGrid(CUfunction f, int grid_width, int grid_height) {
-  /* rate_limiter(grid_width * grid_height, g_block_x * g_block_y * g_block_z); */
+   rate_limiter(grid_width * grid_height, g_block_x * g_block_y * g_block_z); 
   printf("cuLaunchGrid in call subseq is: %d\n", ++seq);
   return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchGrid, f, grid_width,
                          grid_height);
@@ -1050,14 +1050,14 @@ CUresult cuLaunchGrid(CUfunction f, int grid_width, int grid_height) {
 
 CUresult cuLaunchGridAsync(CUfunction f, int grid_width, int grid_height,
                            CUstream hStream) {
-  /* rate_limiter(grid_width * grid_height, g_block_x * g_block_y * g_block_z); */
+   rate_limiter(grid_width * grid_height, g_block_x * g_block_y * g_block_z); 
   printf("cuLaunchGridAsync in call subseq is: %d\n", ++seq);
   return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchGridAsync, f, grid_width,
                          grid_height, hStream);
 }
 
 CUresult cuFuncSetBlockShape(CUfunction hfunc, int x, int y, int z) {
-  /* if (g_vcuda_config.enable) {
+   if (g_vcuda_config.enable) {
     while (!CAS(&g_block_locker, 0, 1)) {
     }
 
@@ -1069,7 +1069,7 @@ CUresult cuFuncSetBlockShape(CUfunction hfunc, int x, int y, int z) {
 
     while (!CAS(&g_block_locker, 1, 0)) {
     }
-  } */
+  } 
   printf("cuFuncSetBlockShape in call subseq is: %d\n", ++seq);
   return CUDA_ENTRY_CALL(cuda_library_entry, cuFuncSetBlockShape, hfunc, x, y,
                          z);
