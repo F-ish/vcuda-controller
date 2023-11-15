@@ -53,7 +53,7 @@
 /**
  * CUDA API version number
  */
-#define CUDA_VERSION 11070
+//#define CUDA_VERSION 11070
 
 #ifdef __cplusplus
 extern "C" {

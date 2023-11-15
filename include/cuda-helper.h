@@ -148,11 +148,11 @@ typedef enum {
   /** cuMemGetInfo_v2 */
   CUDA_ENTRY_ENUM(cuMemGetInfo_v2),
   /** cuMemAllocManaged */
-  CUDA_ENTRY_ENUM(cuMemAllocManaged),
+  //CUDA_ENTRY_ENUM(cuMemAllocManaged),
   /** cuMemAlloc_v2 */
-  CUDA_ENTRY_ENUM(cuMemAlloc_v2),
+  //CUDA_ENTRY_ENUM(cuMemAlloc_v2),
   /** cuMemAllocPitch_v2 */
-  CUDA_ENTRY_ENUM(cuMemAllocPitch_v2),
+  //CUDA_ENTRY_ENUM(cuMemAllocPitch_v2),
   /** cuMemFree_v2 */
   CUDA_ENTRY_ENUM(cuMemFree_v2),
   /** cuMemGetAddressRange_v2 */
@@ -260,17 +260,17 @@ typedef enum {
   /** cuFuncGetAttribute */
   CUDA_ENTRY_ENUM(cuFuncGetAttribute),
   /** cuArrayCreate_v2 */
-  CUDA_ENTRY_ENUM(cuArrayCreate_v2),
+  //CUDA_ENTRY_ENUM(cuArrayCreate_v2),
   /** cuArrayGetDescriptor_v2 */
   CUDA_ENTRY_ENUM(cuArrayGetDescriptor_v2),
   /** cuArray3DCreate_v2 */
-  CUDA_ENTRY_ENUM(cuArray3DCreate_v2),
+  //CUDA_ENTRY_ENUM(cuArray3DCreate_v2),
   /** cuArray3DGetDescriptor_v2 */
   CUDA_ENTRY_ENUM(cuArray3DGetDescriptor_v2),
   /** cuArrayDestroy */
   CUDA_ENTRY_ENUM(cuArrayDestroy),
   /** cuMipmappedArrayCreate */
-  CUDA_ENTRY_ENUM(cuMipmappedArrayCreate),
+  //CUDA_ENTRY_ENUM(cuMipmappedArrayCreate),
   /** cuMipmappedArrayGetLevel */
   CUDA_ENTRY_ENUM(cuMipmappedArrayGetLevel),
   /** cuMipmappedArrayDestroy */
@@ -484,11 +484,11 @@ typedef enum {
   /** cuGetErrorName */
   CUDA_ENTRY_ENUM(cuGetErrorName),
   /** cuArray3DCreate */
-  CUDA_ENTRY_ENUM(cuArray3DCreate),
+  //CUDA_ENTRY_ENUM(cuArray3DCreate),
   /** cuArray3DGetDescriptor */
   CUDA_ENTRY_ENUM(cuArray3DGetDescriptor),
   /** cuArrayCreate */
-  CUDA_ENTRY_ENUM(cuArrayCreate),
+  //CUDA_ENTRY_ENUM(cuArrayCreate),
   /** cuArrayGetDescriptor */
   CUDA_ENTRY_ENUM(cuArrayGetDescriptor),
   /** cuCtxAttach */
@@ -592,13 +592,13 @@ typedef enum {
   /** cuLinkCreate_v2 */
   CUDA_ENTRY_ENUM(cuLinkCreate_v2),
   /** cuMemAlloc */
-  CUDA_ENTRY_ENUM(cuMemAlloc),
+  //CUDA_ENTRY_ENUM(cuMemAlloc),
   /** cuMemAllocHost */
   CUDA_ENTRY_ENUM(cuMemAllocHost),
   /** cuMemAllocHost_v2 */
   CUDA_ENTRY_ENUM(cuMemAllocHost_v2),
   /** cuMemAllocPitch */
-  CUDA_ENTRY_ENUM(cuMemAllocPitch),
+  //CUDA_ENTRY_ENUM(cuMemAllocPitch),
   /** cuMemcpy2D */
   CUDA_ENTRY_ENUM(cuMemcpy2D),
   /** cuMemcpy2DAsync */
