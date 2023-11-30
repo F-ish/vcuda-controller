@@ -556,7 +556,7 @@ static void register_to_remote() {
           NVML_DEVICE_PCI_BUS_ID_BUFFER_SIZE);
 
   register_to_remote_with_data(g_vcuda_config.bus_id, g_vcuda_config.pod_uid,
-                               g_vcuda_config.container_name);
+                               g_vcuda_config.container_name, "");
 }
 
 static void initialization() {

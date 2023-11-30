@@ -33,7 +33,7 @@ static const struct timespec g_cycle = {
 
 // #lizard forgives
 void register_to_remote_with_data(const char* bus_id, const char* pod_uid,
-                                  const char* container) {
+                                  const char* container, const char* cont_name) {
   pid_t register_pid;
   int wstatus = 0, wret = 0;
   pid_t child_pid;
@@ -56,7 +56,7 @@ void register_to_remote_with_data(const char* bus_id, const char* pod_uid,
     if (is_custom_config_path()) {
       ret = execl((RPC_CLIENT_PATH RPC_CLIENT_NAME), RPC_CLIENT_NAME, "--addr",
                   RPC_ADDR, "--bus-id", bus_id, "--pod-uid", pod_uid,
-                  "--cont-id", container, (char*)NULL);
+                  "--cont-name", cont_name, "--cont-id", container, (char*)NULL);
     } else {
       ret = execl((RPC_CLIENT_PATH RPC_CLIENT_NAME), RPC_CLIENT_NAME, "--addr",
                   RPC_ADDR, "--bus-id", bus_id, "--pod-uid", pod_uid,

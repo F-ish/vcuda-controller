@@ -1,15 +1,13 @@
 # stage 1
-FROM nvidia/cuda:11.5.1-devel-ubuntu18.04 as build
+FROM nvidia/cuda:11.5.2-devel-ubuntu20.04 as build
 
 
-#RUN gpg --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC && \
-#    gpg --export --armor A4B469963BF863CC | apt-key add -
 RUN apt update && apt install -y --no-install-recommends \
   curl
 
 RUN curl -s -L https://nvidia.github.io/libnvidia-container/gpgkey | apt-key add -
 
-RUN apt install -y --no-install-recommends \
+RUN DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
   cmake libvdpau-dev && \
   rm -rf /var/lib/apt/lists/*
 
@@ -53,5 +51,5 @@ FROM centos:7
 ARG version
 ARG commit
 
-COPY --from=rpmpkg  /root/rpmbuild/RPMS/x86_64/vcuda-${version}-${commit}.el7.x86_64.rpm /tmp
-RUN rpm -ivh /tmp/vcuda-${version}-${commit}.el7.x86_64.rpm && rm -rf /tmp/vcuda-${version}-${commit}.el7.x86_64.rpm
+COPY --from=rpmpkg  /root/rpmbuild/RPMS/*/vcuda-${version}-${commit}.el7.*.rpm /tmp
+RUN rpm -ivh /tmp/vcuda-${version}-${commit}.el7.*.rpm && rm -rf /tmp/vcuda-${version}-${commit}.el7.*.rpm
