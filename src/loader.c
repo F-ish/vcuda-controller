@@ -1151,6 +1151,8 @@ DONE:
 static int get_path_by_cgroup(const char *pid_cgroup) {
   int ret = 1;
   char pod_uid[4096], container_id[4096], cont_name[4096];
+  
+  cont_name[0] = '\0';
 
   if (is_custom_config_path()) {
     return 0;
