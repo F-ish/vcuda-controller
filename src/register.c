@@ -54,17 +54,17 @@ void register_to_remote_with_data(const char* bus_id, const char* pod_uid,
 
     // child
     if (strlen(cont_name) <= 0) {
-      printf("pod_uid is %s, cont_name is %s\n", pod_uid, cont_name);
-      printf("cgroup v2 mode ,use cont name to register\n");
-      ret = execl((RPC_CLIENT_PATH RPC_CLIENT_NAME), RPC_CLIENT_NAME, "--addr",
-                  RPC_ADDR, "--bus-id", bus_id, "--pod-uid", pod_uid,
-                  "--cont-id", container, (char*)NULL);
-    } else {
       printf("pod_uid is %s, cont_id is %s\n", pod_uid, container);
       printf("cgroup v1 mode ,use cont id to register\n");
       ret = execl((RPC_CLIENT_PATH RPC_CLIENT_NAME), RPC_CLIENT_NAME, "--addr",
                   RPC_ADDR, "--bus-id", bus_id, "--pod-uid", pod_uid,
-                  "--cont-name", container, (char*)NULL);
+                  "--cont-id", container, (char*)NULL);
+    } else {
+      printf("pod_uid is %s, cont_name is %s\n", pod_uid, cont_name);
+      printf("cgroup v2 mode ,use cont name to register\n");
+      ret = execl((RPC_CLIENT_PATH RPC_CLIENT_NAME), RPC_CLIENT_NAME, "--addr",
+                  RPC_ADDR, "--bus-id", bus_id, "--pod-uid", pod_uid,
+                  "--cont-name", cont_name, (char*)NULL);
     }
     if (unlikely(ret == -1)) {
       LOGGER(FATAL, "can't register to manager, error %s", strerror(errno));
