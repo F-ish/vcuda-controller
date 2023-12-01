@@ -967,7 +967,7 @@ int get_cgroupV2_data(const char *pid_cgroup, char *pod_uid, char *container_id,
   
   char *prefix_pod = "/var/lib/kubelet/pods/";
   char *end_pod = "/containers/";
-  char *fakeContainer_id = "fakeContainerId";
+  //char *fakeContainer_id = "fakeContainerId";
 
   int ret = 1;
   FILE *cgroup_fd = NULL;
@@ -986,8 +986,8 @@ int get_cgroupV2_data(const char *pid_cgroup, char *pod_uid, char *container_id,
     }
 
     if (getStr(buffer, prefix_pod, end_pod, pod_uid, pod_name)) {
-      strncpy(container_id, fakeContainer_id, strlen(fakeContainer_id));
-      container_id[strlen(fakeContainer_id)] = '\0';
+      //strncpy(container_id, fakeContainer_id, strlen(fakeContainer_id));
+      //container_id[strlen(fakeContainer_id)] = '\0';
       break;
     }
   }
@@ -1161,6 +1161,10 @@ static int get_path_by_cgroup(const char *pid_cgroup) {
     LOGGER(4, "can't find container id from %s", pid_cgroup);
     goto DONE;
     }
+    snprintf(base_dir, sizeof(base_dir), "%s%s", VCUDA_CONFIG_PATH, cont_name);
+    snprintf(config_path, sizeof(config_path), "%s/%s", base_dir,
+           CONTROLLER_CONFIG_NAME);
+    snprintf(pid_path, sizeof(pid_path), "%s/%s", base_dir, PIDS_CONFIG_NAME);
   }
   else{
     if (unlikely(get_cgroup_data(pid_cgroup, pod_uid, container_id,
@@ -1168,12 +1172,13 @@ static int get_path_by_cgroup(const char *pid_cgroup) {
     LOGGER(4, "can't find container id from %s", pid_cgroup);
     goto DONE;
     }
+    snprintf(base_dir, sizeof(base_dir), "%s%s", VCUDA_CONFIG_PATH, container_id);
+    snprintf(config_path, sizeof(config_path), "%s/%s", base_dir,
+           CONTROLLER_CONFIG_NAME);
+    snprintf(pid_path, sizeof(pid_path), "%s/%s", base_dir, PIDS_CONFIG_NAME);
   }
 
-  snprintf(base_dir, sizeof(base_dir), "%s%s", VCUDA_CONFIG_PATH, container_id);
-  snprintf(config_path, sizeof(config_path), "%s/%s", base_dir,
-           CONTROLLER_CONFIG_NAME);
-  snprintf(pid_path, sizeof(pid_path), "%s/%s", base_dir, PIDS_CONFIG_NAME);
+
 
   LOGGER(4, "config file: %s", config_path);
   LOGGER(4, "pid file: %s", pid_path);

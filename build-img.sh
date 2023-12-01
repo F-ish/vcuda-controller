@@ -32,9 +32,9 @@ function build_img() {
       #docker buildx use mybuilder --node mybuilder
       #docker run --privileged --rm tonistiigi/binfmt --install all
       #docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-      docker build ${BUILD_FLAGS:-} --build-arg version=${version} --build-arg commit=${commit} -t ${IMAGE_FILE} .
+      #docker build ${BUILD_FLAGS:-} --build-arg version=${version} --build-arg commit=${commit} -t ${IMAGE_FILE} .
       #docker buildx build $FILEPATH/build --platform linux/arm64,linux/amd64 --no-cache ${BUILD_FLAGS:-} --build-arg version=${version} --build-arg commit=${commit} -t $repo/$img:v$version --push  -f $FILEPATH/build/Dockerfile
-      #docker buildx build --load --no-cache /home/onceas/wyy/gpudeploy/vcuda-controller/build    --platform linux/amd64 ${BUILD_FLAGS:-} --build-arg version=${version} --build-arg commit=${commit} -t ${IMAGE_FILE}-amd64  -f /home/onceas/wyy/gpudeploy/vcuda-controller/build/Dockerfile
+      docker buildx build --load --no-cache /home/onceas/wyy/gpudeploy/vcuda-controller/build    --platform linux/amd64 ${BUILD_FLAGS:-} --build-arg version=${version} --build-arg commit=${commit} -t ${IMAGE_FILE}  -f /home/onceas/wyy/gpudeploy/vcuda-controller/build/Dockerfile
 
     )
 }

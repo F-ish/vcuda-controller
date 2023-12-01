@@ -53,10 +53,10 @@ void register_to_remote_with_data(const char* bus_id, const char* pod_uid,
     }
 
     // child
-    if (is_custom_config_path()) {
+    if (strlen(cont_name) <= 0) {
       ret = execl((RPC_CLIENT_PATH RPC_CLIENT_NAME), RPC_CLIENT_NAME, "--addr",
                   RPC_ADDR, "--bus-id", bus_id, "--pod-uid", pod_uid,
-                  "--cont-name", cont_name, "--cont-id", container, (char*)NULL);
+                  "--cont-id", container, (char*)NULL);
     } else {
       ret = execl((RPC_CLIENT_PATH RPC_CLIENT_NAME), RPC_CLIENT_NAME, "--addr",
                   RPC_ADDR, "--bus-id", bus_id, "--pod-uid", pod_uid,
