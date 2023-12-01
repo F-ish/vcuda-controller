@@ -957,6 +957,7 @@ int getStr(const char *buffer, const char *prefixstr, const char *endstr, char *
         nameEnd = strchr(end, '/');
         length = nameEnd -end;
         strncpy(podName, end, length);
+        podName[length] = '\0';
 
         return 1;
 }
