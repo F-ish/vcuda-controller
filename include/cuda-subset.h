@@ -49,23 +49,183 @@
 #ifndef HIJACK_CUDA_SUBSET_H
 #define HIJACK_CUDA_SUBSET_H
 
+#include <stdlib.h>
+#include <stddef.h>
+#include <vdpau/vdpau.h>
+#ifdef _MSC_VER
+typedef unsigned __int32 cuuint32_t;
+typedef unsigned __int64 cuuint64_t;
+#else
+#include <stdint.h>
+typedef uint32_t cuuint32_t;
+typedef uint64_t cuuint64_t;
+#endif
+
+#if defined(__CUDA_API_VERSION_INTERNAL) || defined(__DOXYGEN_ONLY__) || defined(CUDA_ENABLE_DEPRECATED)
+#define __CUDA_DEPRECATED
+#elif defined(_MSC_VER)
+#define __CUDA_DEPRECATED __declspec(deprecated)
+#elif defined(__GNUC__)
+#define __CUDA_DEPRECATED __attribute__((deprecated))
+#else
+#define __CUDA_DEPRECATED
+#endif
+
+#if defined(CUDA_FORCE_API_VERSION)
+#error "CUDA_FORCE_API_VERSION is no longer supported."
+#endif
+
+#if defined(__CUDA_API_VERSION_INTERNAL) || defined(CUDA_API_PER_THREAD_DEFAULT_STREAM)
+    #define __CUDA_API_PER_THREAD_DEFAULT_STREAM
+    #define __CUDA_API_PTDS(api) api ## _ptds
+    #define __CUDA_API_PTSZ(api) api ## _ptsz
+#else
+    #define __CUDA_API_PTDS(api) api
+    #define __CUDA_API_PTSZ(api) api
+#endif
+
+#define cuDeviceTotalMem                    cuDeviceTotalMem_v2
+#define cuCtxCreate                         cuCtxCreate_v2
+#define cuCtxCreate_v3                      cuCtxCreate_v3
+#define cuModuleGetGlobal                   cuModuleGetGlobal_v2
+#define cuMemGetInfo                        cuMemGetInfo_v2
+#define cuMemAlloc                          cuMemAlloc_v2
+#define cuMemAllocPitch                     cuMemAllocPitch_v2
+#define cuMemFree                           cuMemFree_v2
+#define cuMemGetAddressRange                cuMemGetAddressRange_v2
+#define cuMemAllocHost                      cuMemAllocHost_v2
+#define cuMemHostGetDevicePointer           cuMemHostGetDevicePointer_v2
+#define cuMemcpyHtoD                        __CUDA_API_PTDS(cuMemcpyHtoD_v2)
+#define cuMemcpyDtoH                        __CUDA_API_PTDS(cuMemcpyDtoH_v2)
+#define cuMemcpyDtoD                        __CUDA_API_PTDS(cuMemcpyDtoD_v2)
+#define cuMemcpyDtoA                        __CUDA_API_PTDS(cuMemcpyDtoA_v2)
+#define cuMemcpyAtoD                        __CUDA_API_PTDS(cuMemcpyAtoD_v2)
+#define cuMemcpyHtoA                        __CUDA_API_PTDS(cuMemcpyHtoA_v2)
+#define cuMemcpyAtoH                        __CUDA_API_PTDS(cuMemcpyAtoH_v2)
+#define cuMemcpyAtoA                        __CUDA_API_PTDS(cuMemcpyAtoA_v2)
+#define cuMemcpyHtoAAsync                   __CUDA_API_PTSZ(cuMemcpyHtoAAsync_v2)
+#define cuMemcpyAtoHAsync                   __CUDA_API_PTSZ(cuMemcpyAtoHAsync_v2)
+#define cuMemcpy2D                          __CUDA_API_PTDS(cuMemcpy2D_v2)
+#define cuMemcpy2DUnaligned                 __CUDA_API_PTDS(cuMemcpy2DUnaligned_v2)
+#define cuMemcpy3D                          __CUDA_API_PTDS(cuMemcpy3D_v2)
+#define cuMemcpyHtoDAsync                   __CUDA_API_PTSZ(cuMemcpyHtoDAsync_v2)
+#define cuMemcpyDtoHAsync                   __CUDA_API_PTSZ(cuMemcpyDtoHAsync_v2)
+#define cuMemcpyDtoDAsync                   __CUDA_API_PTSZ(cuMemcpyDtoDAsync_v2)
+#define cuMemcpy2DAsync                     __CUDA_API_PTSZ(cuMemcpy2DAsync_v2)
+#define cuMemcpy3DAsync                     __CUDA_API_PTSZ(cuMemcpy3DAsync_v2)
+#define cuMemsetD8                          __CUDA_API_PTDS(cuMemsetD8_v2)
+#define cuMemsetD16                         __CUDA_API_PTDS(cuMemsetD16_v2)
+#define cuMemsetD32                         __CUDA_API_PTDS(cuMemsetD32_v2)
+#define cuMemsetD2D8                        __CUDA_API_PTDS(cuMemsetD2D8_v2)
+#define cuMemsetD2D16                       __CUDA_API_PTDS(cuMemsetD2D16_v2)
+#define cuMemsetD2D32                       __CUDA_API_PTDS(cuMemsetD2D32_v2)
+#define cuArrayCreate                       cuArrayCreate_v2
+#define cuArrayGetDescriptor                cuArrayGetDescriptor_v2
+#define cuArray3DCreate                     cuArray3DCreate_v2
+#define cuArray3DGetDescriptor              cuArray3DGetDescriptor_v2
+#define cuTexRefSetAddress                  cuTexRefSetAddress_v2
+#define cuTexRefGetAddress                  cuTexRefGetAddress_v2
+#define cuGraphicsResourceGetMappedPointer  cuGraphicsResourceGetMappedPointer_v2
+#define cuCtxDestroy                        cuCtxDestroy_v2
+#define cuCtxPopCurrent                     cuCtxPopCurrent_v2
+#define cuCtxPushCurrent                    cuCtxPushCurrent_v2
+#define cuStreamDestroy                     cuStreamDestroy_v2
+#define cuEventDestroy                      cuEventDestroy_v2
+#define cuTexRefSetAddress2D                cuTexRefSetAddress2D_v3
+#define cuLinkCreate                        cuLinkCreate_v2
+#define cuLinkAddData                       cuLinkAddData_v2
+#define cuLinkAddFile                       cuLinkAddFile_v2
+#define cuMemHostRegister                   cuMemHostRegister_v2
+#define cuGraphicsResourceSetMapFlags       cuGraphicsResourceSetMapFlags_v2
+#define cuStreamBeginCapture                __CUDA_API_PTSZ(cuStreamBeginCapture_v2)
+#define cuDevicePrimaryCtxRelease           cuDevicePrimaryCtxRelease_v2
+#define cuDevicePrimaryCtxReset             cuDevicePrimaryCtxReset_v2
+#define cuDevicePrimaryCtxSetFlags          cuDevicePrimaryCtxSetFlags_v2
+#define cuDeviceGetUuid_v2                  cuDeviceGetUuid_v2
+#define cuIpcOpenMemHandle                  cuIpcOpenMemHandle_v2
+#define cuGraphInstantiate                  cuGraphInstantiate_v2
+
+#if defined(__CUDA_API_PER_THREAD_DEFAULT_STREAM)
+    #define cuMemcpy                            __CUDA_API_PTDS(cuMemcpy)
+    #define cuMemcpyAsync                       __CUDA_API_PTSZ(cuMemcpyAsync)
+    #define cuMemcpyPeer                        __CUDA_API_PTDS(cuMemcpyPeer)
+    #define cuMemcpyPeerAsync                   __CUDA_API_PTSZ(cuMemcpyPeerAsync)
+    #define cuMemcpy3DPeer                      __CUDA_API_PTDS(cuMemcpy3DPeer)
+    #define cuMemcpy3DPeerAsync                 __CUDA_API_PTSZ(cuMemcpy3DPeerAsync)
+    #define cuMemPrefetchAsync                  __CUDA_API_PTSZ(cuMemPrefetchAsync)
+
+    #define cuMemsetD8Async                     __CUDA_API_PTSZ(cuMemsetD8Async)
+    #define cuMemsetD16Async                    __CUDA_API_PTSZ(cuMemsetD16Async)
+    #define cuMemsetD32Async                    __CUDA_API_PTSZ(cuMemsetD32Async)
+    #define cuMemsetD2D8Async                   __CUDA_API_PTSZ(cuMemsetD2D8Async)
+    #define cuMemsetD2D16Async                  __CUDA_API_PTSZ(cuMemsetD2D16Async)
+    #define cuMemsetD2D32Async                  __CUDA_API_PTSZ(cuMemsetD2D32Async)
+
+    #define cuStreamGetPriority                 __CUDA_API_PTSZ(cuStreamGetPriority)
+    #define cuStreamGetFlags                    __CUDA_API_PTSZ(cuStreamGetFlags)
+    #define cuStreamGetCtx                      __CUDA_API_PTSZ(cuStreamGetCtx)
+    #define cuStreamWaitEvent                   __CUDA_API_PTSZ(cuStreamWaitEvent)
+    #define cuStreamEndCapture                  __CUDA_API_PTSZ(cuStreamEndCapture)
+    #define cuStreamIsCapturing                 __CUDA_API_PTSZ(cuStreamIsCapturing)
+    #define cuStreamGetCaptureInfo              __CUDA_API_PTSZ(cuStreamGetCaptureInfo)
+    #define cuStreamGetCaptureInfo_v2           __CUDA_API_PTSZ(cuStreamGetCaptureInfo_v2)
+    #define cuStreamUpdateCaptureDependencies   __CUDA_API_PTSZ(cuStreamUpdateCaptureDependencies)
+    #define cuStreamAddCallback                 __CUDA_API_PTSZ(cuStreamAddCallback)
+    #define cuStreamAttachMemAsync              __CUDA_API_PTSZ(cuStreamAttachMemAsync)
+    #define cuStreamQuery                       __CUDA_API_PTSZ(cuStreamQuery)
+    #define cuStreamSynchronize                 __CUDA_API_PTSZ(cuStreamSynchronize)
+    #define cuEventRecord                       __CUDA_API_PTSZ(cuEventRecord)
+    #define cuEventRecordWithFlags              __CUDA_API_PTSZ(cuEventRecordWithFlags)
+    #define cuLaunchKernel                      __CUDA_API_PTSZ(cuLaunchKernel)
+
+
+
+    #define cuLaunchHostFunc                    __CUDA_API_PTSZ(cuLaunchHostFunc)
+    #define cuGraphicsMapResources              __CUDA_API_PTSZ(cuGraphicsMapResources)
+    #define cuGraphicsUnmapResources            __CUDA_API_PTSZ(cuGraphicsUnmapResources)
+
+    #define cuStreamWriteValue32                __CUDA_API_PTSZ(cuStreamWriteValue32)
+    #define cuStreamWaitValue32                 __CUDA_API_PTSZ(cuStreamWaitValue32)
+    #define cuStreamWriteValue64                __CUDA_API_PTSZ(cuStreamWriteValue64)
+    #define cuStreamWaitValue64                 __CUDA_API_PTSZ(cuStreamWaitValue64)
+    #define cuStreamBatchMemOp                  __CUDA_API_PTSZ(cuStreamBatchMemOp)
+
+    #define cuStreamWriteValue32_v2             __CUDA_API_PTSZ(cuStreamWriteValue32_v2)
+    #define cuStreamWaitValue32_v2              __CUDA_API_PTSZ(cuStreamWaitValue32_v2)
+    #define cuStreamWriteValue64_v2             __CUDA_API_PTSZ(cuStreamWriteValue64_v2)
+    #define cuStreamWaitValue64_v2              __CUDA_API_PTSZ(cuStreamWaitValue64_v2)
+    #define cuStreamBatchMemOp_v2               __CUDA_API_PTSZ(cuStreamBatchMemOp_v2)
+
+
+    #define cuLaunchCooperativeKernel           __CUDA_API_PTSZ(cuLaunchCooperativeKernel)
+
+    #define cuSignalExternalSemaphoresAsync     __CUDA_API_PTSZ(cuSignalExternalSemaphoresAsync)
+    #define cuWaitExternalSemaphoresAsync       __CUDA_API_PTSZ(cuWaitExternalSemaphoresAsync)
+
+
+
+
+    #define cuGraphUpload                       __CUDA_API_PTSZ(cuGraphUpload)
+    #define cuGraphLaunch                       __CUDA_API_PTSZ(cuGraphLaunch)
+    #define cuStreamCopyAttributes              __CUDA_API_PTSZ(cuStreamCopyAttributes)
+    #define cuStreamGetAttribute                __CUDA_API_PTSZ(cuStreamGetAttribute)
+    #define cuStreamSetAttribute                __CUDA_API_PTSZ(cuStreamSetAttribute)
+    #define cuMemMapArrayAsync                  __CUDA_API_PTSZ(cuMemMapArrayAsync)
+
+    #define cuMemFreeAsync                      __CUDA_API_PTSZ(cuMemFreeAsync)
+    #define cuMemAllocAsync                     __CUDA_API_PTSZ(cuMemAllocAsync)
+    #define cuMemAllocFromPoolAsync             __CUDA_API_PTSZ(cuMemAllocFromPoolAsync)
+#endif
 
 /**
  * CUDA API version number
  */
-//#define CUDA_VERSION 11070
+#define CUDA_VERSION 11070
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include<stdlib.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <vdpau/vdpau.h>
-
-typedef uint32_t cuuint32_t;
-typedef uint64_t cuuint64_t;
 
 typedef unsigned int GLuint; /* 4-byte unsigned */
 typedef unsigned int GLenum;
@@ -140,6 +300,7 @@ typedef CUipcMemHandle_v1 CUipcMemHandle;
 typedef enum CUipcMem_flags_enum {
     CU_IPC_MEM_LAZY_ENABLE_PEER_ACCESS = 0x1 /**< Automatically enable peer access between remote devices as needed */
 } CUipcMem_flags;
+
 
 /**
  * CUDA Mem Attach Flags
@@ -279,6 +440,7 @@ typedef enum CUstreamBatchMemOpType_enum {
                                                   standalone operation. */
 } CUstreamBatchMemOpType;
 
+
 /**
  * Flags for ::cuStreamMemoryBarrier
  */
@@ -286,6 +448,7 @@ typedef enum CUstreamMemoryBarrier_flags_enum {
     CU_STREAM_MEMORY_BARRIER_TYPE_SYS = 0x0, /**< System-wide memory barrier. */
     CU_STREAM_MEMORY_BARRIER_TYPE_GPU = 0x1 /**< Limit memory barrier scope to the GPU. */
 } CUstreamMemoryBarrier_flags;
+
 
 /**
  * Per-operation parameters for ::cuStreamBatchMemOp
@@ -326,12 +489,14 @@ typedef union CUstreamBatchMemOpParams_union {
 } CUstreamBatchMemOpParams_v1;
 typedef CUstreamBatchMemOpParams_v1 CUstreamBatchMemOpParams;
 
+
 typedef struct CUDA_BATCH_MEM_OP_NODE_PARAMS_st {
     CUcontext ctx;
     unsigned int count;
     CUstreamBatchMemOpParams *paramArray;
     unsigned int flags;
 } CUDA_BATCH_MEM_OP_NODE_PARAMS;
+
 
 /**
  * Occupancy calculator flag
@@ -1367,6 +1532,32 @@ typedef enum CUgraphNodeType_enum {
     CU_GRAPH_NODE_TYPE_BATCH_MEM_OP     = 12 /**< Batch MemOp Node */
 
 } CUgraphNodeType;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 typedef enum CUsynchronizationPolicy_enum {
     CU_SYNC_POLICY_AUTO = 1,
@@ -3585,6 +3776,20 @@ typedef enum CUgraphInstantiate_flags_enum {
 
 } CUgraphInstantiate_flags;
 
+/** @} */ /* END CUDA_TYPES */
+
+#if defined(__GNUC__)
+  #if defined(__CUDA_API_PUSH_VISIBILITY_DEFAULT)
+    #pragma GCC visibility push(default)
+  #endif
+#endif
+
+#ifdef _WIN32
+#define CUDAAPI __stdcall
+#else
+#define CUDAAPI
+#endif
+
 
 typedef enum CUmoduleLoadingMode_enum {
     CU_MODULE_EAGER_LOADING = 0x1, /**< Lazy Kernel Loading is not enabled */
@@ -3745,8 +3950,386 @@ typedef int32_t EGLint;
 typedef void *EGLImageKHR;
 
 
+/**
+ * CUDA API versioning support
+ */
+#if defined(__CUDA_API_VERSION_INTERNAL)
+    #undef cuMemHostRegister
+    #undef cuGraphicsResourceSetMapFlags
+    #undef cuLinkCreate
+    #undef cuLinkAddData
+    #undef cuLinkAddFile
+    #undef cuDeviceTotalMem
+    #undef cuCtxCreate
+    #undef cuModuleGetGlobal
+    #undef cuMemGetInfo
+    #undef cuMemAlloc
+    #undef cuMemAllocPitch
+    #undef cuMemFree
+    #undef cuMemGetAddressRange
+    #undef cuMemAllocHost
+    #undef cuMemHostGetDevicePointer
+    #undef cuMemcpyHtoD
+    #undef cuMemcpyDtoH
+    #undef cuMemcpyDtoD
+    #undef cuMemcpyDtoA
+    #undef cuMemcpyAtoD
+    #undef cuMemcpyHtoA
+    #undef cuMemcpyAtoH
+    #undef cuMemcpyAtoA
+    #undef cuMemcpyHtoAAsync
+    #undef cuMemcpyAtoHAsync
+    #undef cuMemcpy2D
+    #undef cuMemcpy2DUnaligned
+    #undef cuMemcpy3D
+    #undef cuMemcpyHtoDAsync
+    #undef cuMemcpyDtoHAsync
+    #undef cuMemcpyDtoDAsync
+    #undef cuMemcpy2DAsync
+    #undef cuMemcpy3DAsync
+    #undef cuMemsetD8
+    #undef cuMemsetD16
+    #undef cuMemsetD32
+    #undef cuMemsetD2D8
+    #undef cuMemsetD2D16
+    #undef cuMemsetD2D32
+    #undef cuArrayCreate
+    #undef cuArrayGetDescriptor
+    #undef cuArray3DCreate
+    #undef cuArray3DGetDescriptor
+    #undef cuTexRefSetAddress
+    #undef cuTexRefSetAddress2D
+    #undef cuTexRefGetAddress
+    #undef cuGraphicsResourceGetMappedPointer
+    #undef cuCtxDestroy
+    #undef cuCtxPopCurrent
+    #undef cuCtxPushCurrent
+    #undef cuStreamDestroy
+    #undef cuEventDestroy
+    #undef cuMemcpy
+    #undef cuMemcpyAsync
+    #undef cuMemcpyPeer
+    #undef cuMemcpyPeerAsync
+    #undef cuMemcpy3DPeer
+    #undef cuMemcpy3DPeerAsync
+    #undef cuMemsetD8Async
+    #undef cuMemsetD16Async
+    #undef cuMemsetD32Async
+    #undef cuMemsetD2D8Async
+    #undef cuMemsetD2D16Async
+    #undef cuMemsetD2D32Async
+    #undef cuStreamGetPriority
+    #undef cuStreamGetFlags
+    #undef cuStreamGetCtx
+    #undef cuStreamWaitEvent
+    #undef cuStreamAddCallback
+    #undef cuStreamAttachMemAsync
+    #undef cuStreamQuery
+    #undef cuStreamSynchronize
+    #undef cuEventRecord
+    #undef cuEventRecordWithFlags
+    #undef cuLaunchKernel
+
+
+
+    #undef cuLaunchHostFunc
+    #undef cuGraphicsMapResources
+    #undef cuGraphicsUnmapResources
+    #undef cuStreamWriteValue32
+    #undef cuStreamWaitValue32
+    #undef cuStreamWriteValue64
+    #undef cuStreamWaitValue64
+    #undef cuStreamBatchMemOp
+    #undef cuStreamWriteValue32_v2
+    #undef cuStreamWaitValue32_v2
+    #undef cuStreamWriteValue64_v2
+    #undef cuStreamWaitValue64_v2
+    #undef cuStreamBatchMemOp_v2
+    #undef cuMemPrefetchAsync
+    #undef cuLaunchCooperativeKernel
+    #undef cuSignalExternalSemaphoresAsync
+    #undef cuWaitExternalSemaphoresAsync
+    #undef cuStreamBeginCapture
+    #undef cuStreamEndCapture
+    #undef cuStreamIsCapturing
+    #undef cuStreamGetCaptureInfo
+    #undef cuStreamGetCaptureInfo_v2
+
+
+
+    #undef cuGraphUpload
+    #undef cuGraphLaunch
+    #undef cuDevicePrimaryCtxRelease
+    #undef cuDevicePrimaryCtxReset
+    #undef cuDevicePrimaryCtxSetFlags
+    #undef cuIpcOpenMemHandle
+    #undef cuStreamCopyAttributes
+    #undef cuStreamSetAttribute
+    #undef cuStreamGetAttribute
+    #undef cuGraphInstantiate
+    #undef cuMemMapArrayAsync
+    #undef cuMemFreeAsync 
+    #undef cuMemAllocAsync 
+    #undef cuMemAllocFromPoolAsync 
+    #undef cuStreamUpdateCaptureDependencies
+
+    CUresult CUDAAPI cuMemHostRegister(void *p, size_t bytesize, unsigned int Flags);
+    CUresult CUDAAPI cuGraphicsResourceSetMapFlags(CUgraphicsResource resource, unsigned int flags);
+    CUresult CUDAAPI cuLinkCreate(unsigned int numOptions, CUjit_option *options, void **optionValues, CUlinkState *stateOut);
+    CUresult CUDAAPI cuLinkAddData(CUlinkState state, CUjitInputType type, void *data, size_t size, const char *name,
+        unsigned int numOptions, CUjit_option *options, void **optionValues);
+    CUresult CUDAAPI cuLinkAddFile(CUlinkState state, CUjitInputType type, const char *path,
+        unsigned int numOptions, CUjit_option *options, void **optionValues);
+    CUresult CUDAAPI cuTexRefSetAddress2D_v2(CUtexref hTexRef, const CUDA_ARRAY_DESCRIPTOR *desc, CUdeviceptr dptr, size_t Pitch);
+
+    typedef unsigned int CUdeviceptr_v1;
+
+    typedef struct CUDA_MEMCPY2D_v1_st
+    {
+        unsigned int srcXInBytes;   /**< Source X in bytes */
+        unsigned int srcY;          /**< Source Y */
+        CUmemorytype srcMemoryType; /**< Source memory type (host, device, array) */
+        const void *srcHost;        /**< Source host pointer */
+        CUdeviceptr_v1 srcDevice;   /**< Source device pointer */
+        CUarray srcArray;           /**< Source array reference */
+        unsigned int srcPitch;      /**< Source pitch (ignored when src is array) */
+
+        unsigned int dstXInBytes;   /**< Destination X in bytes */
+        unsigned int dstY;          /**< Destination Y */
+        CUmemorytype dstMemoryType; /**< Destination memory type (host, device, array) */
+        void *dstHost;              /**< Destination host pointer */
+        CUdeviceptr_v1 dstDevice;   /**< Destination device pointer */
+        CUarray dstArray;           /**< Destination array reference */
+        unsigned int dstPitch;      /**< Destination pitch (ignored when dst is array) */
+
+        unsigned int WidthInBytes;  /**< Width of 2D memory copy in bytes */
+        unsigned int Height;        /**< Height of 2D memory copy */
+    } CUDA_MEMCPY2D_v1;
+
+    typedef struct CUDA_MEMCPY3D_v1_st
+    {
+        unsigned int srcXInBytes;   /**< Source X in bytes */
+        unsigned int srcY;          /**< Source Y */
+        unsigned int srcZ;          /**< Source Z */
+        unsigned int srcLOD;        /**< Source LOD */
+        CUmemorytype srcMemoryType; /**< Source memory type (host, device, array) */
+        const void *srcHost;        /**< Source host pointer */
+        CUdeviceptr_v1 srcDevice;   /**< Source device pointer */
+        CUarray srcArray;           /**< Source array reference */
+        void *reserved0;            /**< Must be NULL */
+        unsigned int srcPitch;      /**< Source pitch (ignored when src is array) */
+        unsigned int srcHeight;     /**< Source height (ignored when src is array; may be 0 if Depth==1) */
+
+        unsigned int dstXInBytes;   /**< Destination X in bytes */
+        unsigned int dstY;          /**< Destination Y */
+        unsigned int dstZ;          /**< Destination Z */
+        unsigned int dstLOD;        /**< Destination LOD */
+        CUmemorytype dstMemoryType; /**< Destination memory type (host, device, array) */
+        void *dstHost;              /**< Destination host pointer */
+        CUdeviceptr_v1 dstDevice;   /**< Destination device pointer */
+        CUarray dstArray;           /**< Destination array reference */
+        void *reserved1;            /**< Must be NULL */
+        unsigned int dstPitch;      /**< Destination pitch (ignored when dst is array) */
+        unsigned int dstHeight;     /**< Destination height (ignored when dst is array; may be 0 if Depth==1) */
+
+        unsigned int WidthInBytes;  /**< Width of 3D memory copy in bytes */
+        unsigned int Height;        /**< Height of 3D memory copy */
+        unsigned int Depth;         /**< Depth of 3D memory copy */
+    } CUDA_MEMCPY3D_v1;
+
+    typedef struct CUDA_ARRAY_DESCRIPTOR_v1_st
+    {
+        unsigned int Width;         /**< Width of array */
+        unsigned int Height;        /**< Height of array */
+
+        CUarray_format Format;      /**< Array format */
+        unsigned int NumChannels;   /**< Channels per array element */
+    } CUDA_ARRAY_DESCRIPTOR_v1;
+
+    typedef struct CUDA_ARRAY3D_DESCRIPTOR_v1_st
+    {
+        unsigned int Width;         /**< Width of 3D array */
+        unsigned int Height;        /**< Height of 3D array */
+        unsigned int Depth;         /**< Depth of 3D array */
+
+        CUarray_format Format;      /**< Array format */
+        unsigned int NumChannels;   /**< Channels per array element */
+        unsigned int Flags;         /**< Flags */
+    } CUDA_ARRAY3D_DESCRIPTOR_v1;
+
+    CUresult CUDAAPI cuDeviceTotalMem(unsigned int *bytes, CUdevice dev);
+    CUresult CUDAAPI cuCtxCreate(CUcontext *pctx, unsigned int flags, CUdevice dev);
+    CUresult CUDAAPI cuModuleGetGlobal(CUdeviceptr_v1 *dptr, unsigned int *bytes, CUmodule hmod, const char *name);
+    CUresult CUDAAPI cuMemGetInfo(unsigned int *free, unsigned int *total);
+    CUresult CUDAAPI cuMemAlloc(CUdeviceptr_v1 *dptr, unsigned int bytesize);
+    CUresult CUDAAPI cuMemAllocPitch(CUdeviceptr_v1 *dptr, unsigned int *pPitch, unsigned int WidthInBytes, unsigned int Height, unsigned int ElementSizeBytes);
+    CUresult CUDAAPI cuMemFree(CUdeviceptr_v1 dptr);
+    CUresult CUDAAPI cuMemGetAddressRange(CUdeviceptr_v1 *pbase, unsigned int *psize, CUdeviceptr_v1 dptr);
+    CUresult CUDAAPI cuMemAllocHost(void **pp, unsigned int bytesize);
+    CUresult CUDAAPI cuMemHostGetDevicePointer(CUdeviceptr_v1 *pdptr, void *p, unsigned int Flags);
+    CUresult CUDAAPI cuMemcpyHtoD(CUdeviceptr_v1 dstDevice, const void *srcHost, unsigned int ByteCount);
+    CUresult CUDAAPI cuMemcpyDtoH(void *dstHost, CUdeviceptr_v1 srcDevice, unsigned int ByteCount);
+    CUresult CUDAAPI cuMemcpyDtoD(CUdeviceptr_v1 dstDevice, CUdeviceptr_v1 srcDevice, unsigned int ByteCount);
+    CUresult CUDAAPI cuMemcpyDtoA(CUarray dstArray, unsigned int dstOffset, CUdeviceptr_v1 srcDevice, unsigned int ByteCount);
+    CUresult CUDAAPI cuMemcpyAtoD(CUdeviceptr_v1 dstDevice, CUarray srcArray, unsigned int srcOffset, unsigned int ByteCount);
+    CUresult CUDAAPI cuMemcpyHtoA(CUarray dstArray, unsigned int dstOffset, const void *srcHost, unsigned int ByteCount);
+    CUresult CUDAAPI cuMemcpyAtoH(void *dstHost, CUarray srcArray, unsigned int srcOffset, unsigned int ByteCount);
+    CUresult CUDAAPI cuMemcpyAtoA(CUarray dstArray, unsigned int dstOffset, CUarray srcArray, unsigned int srcOffset, unsigned int ByteCount);
+    CUresult CUDAAPI cuMemcpyHtoAAsync(CUarray dstArray, unsigned int dstOffset, const void *srcHost, unsigned int ByteCount, CUstream hStream);
+    CUresult CUDAAPI cuMemcpyAtoHAsync(void *dstHost, CUarray srcArray, unsigned int srcOffset, unsigned int ByteCount, CUstream hStream);
+    CUresult CUDAAPI cuMemcpy2D(const CUDA_MEMCPY2D_v1 *pCopy);
+    CUresult CUDAAPI cuMemcpy2DUnaligned(const CUDA_MEMCPY2D_v1 *pCopy);
+    CUresult CUDAAPI cuMemcpy3D(const CUDA_MEMCPY3D_v1 *pCopy);
+    CUresult CUDAAPI cuMemcpyHtoDAsync(CUdeviceptr_v1 dstDevice, const void *srcHost, unsigned int ByteCount, CUstream hStream);
+    CUresult CUDAAPI cuMemcpyDtoHAsync(void *dstHost, CUdeviceptr_v1 srcDevice, unsigned int ByteCount, CUstream hStream);
+    CUresult CUDAAPI cuMemcpyDtoDAsync(CUdeviceptr_v1 dstDevice, CUdeviceptr_v1 srcDevice, unsigned int ByteCount, CUstream hStream);
+    CUresult CUDAAPI cuMemcpy2DAsync(const CUDA_MEMCPY2D_v1 *pCopy, CUstream hStream);
+    CUresult CUDAAPI cuMemcpy3DAsync(const CUDA_MEMCPY3D_v1 *pCopy, CUstream hStream);
+    CUresult CUDAAPI cuMemsetD8(CUdeviceptr_v1 dstDevice, unsigned char uc, unsigned int N);
+    CUresult CUDAAPI cuMemsetD16(CUdeviceptr_v1 dstDevice, unsigned short us, unsigned int N);
+    CUresult CUDAAPI cuMemsetD32(CUdeviceptr_v1 dstDevice, unsigned int ui, unsigned int N);
+    CUresult CUDAAPI cuMemsetD2D8(CUdeviceptr_v1 dstDevice, unsigned int dstPitch, unsigned char uc, unsigned int Width, unsigned int Height);
+    CUresult CUDAAPI cuMemsetD2D16(CUdeviceptr_v1 dstDevice, unsigned int dstPitch, unsigned short us, unsigned int Width, unsigned int Height);
+    CUresult CUDAAPI cuMemsetD2D32(CUdeviceptr_v1 dstDevice, unsigned int dstPitch, unsigned int ui, unsigned int Width, unsigned int Height);
+    CUresult CUDAAPI cuArrayCreate(CUarray *pHandle, const CUDA_ARRAY_DESCRIPTOR_v1 *pAllocateArray);
+    CUresult CUDAAPI cuArrayGetDescriptor(CUDA_ARRAY_DESCRIPTOR_v1 *pArrayDescriptor, CUarray hArray);
+    CUresult CUDAAPI cuArray3DCreate(CUarray *pHandle, const CUDA_ARRAY3D_DESCRIPTOR_v1 *pAllocateArray);
+    CUresult CUDAAPI cuArray3DGetDescriptor(CUDA_ARRAY3D_DESCRIPTOR_v1 *pArrayDescriptor, CUarray hArray);
+    CUresult CUDAAPI cuTexRefSetAddress(unsigned int *ByteOffset, CUtexref hTexRef, CUdeviceptr_v1 dptr, unsigned int bytes);
+    CUresult CUDAAPI cuTexRefSetAddress2D(CUtexref hTexRef, const CUDA_ARRAY_DESCRIPTOR_v1 *desc, CUdeviceptr_v1 dptr, unsigned int Pitch);
+    CUresult CUDAAPI cuTexRefGetAddress(CUdeviceptr_v1 *pdptr, CUtexref hTexRef);
+    CUresult CUDAAPI cuGraphicsResourceGetMappedPointer(CUdeviceptr_v1 *pDevPtr, unsigned int *pSize, CUgraphicsResource resource);
+
+    CUresult CUDAAPI cuCtxDestroy(CUcontext ctx);
+    CUresult CUDAAPI cuCtxPopCurrent(CUcontext *pctx);
+    CUresult CUDAAPI cuCtxPushCurrent(CUcontext ctx);
+    CUresult CUDAAPI cuStreamDestroy(CUstream hStream);
+    CUresult CUDAAPI cuEventDestroy(CUevent hEvent);
+    CUresult CUDAAPI cuDevicePrimaryCtxRelease(CUdevice dev);
+    CUresult CUDAAPI cuDevicePrimaryCtxReset(CUdevice dev);
+    CUresult CUDAAPI cuDevicePrimaryCtxSetFlags(CUdevice dev, unsigned int flags);
+
+    CUresult CUDAAPI cuMemcpyHtoD_v2(CUdeviceptr dstDevice, const void *srcHost, size_t ByteCount);
+    CUresult CUDAAPI cuMemcpyDtoH_v2(void *dstHost, CUdeviceptr srcDevice, size_t ByteCount);
+    CUresult CUDAAPI cuMemcpyDtoD_v2(CUdeviceptr dstDevice, CUdeviceptr srcDevice, size_t ByteCount);
+    CUresult CUDAAPI cuMemcpyDtoA_v2(CUarray dstArray, size_t dstOffset, CUdeviceptr srcDevice, size_t ByteCount);
+    CUresult CUDAAPI cuMemcpyAtoD_v2(CUdeviceptr dstDevice, CUarray srcArray, size_t srcOffset, size_t ByteCount);
+    CUresult CUDAAPI cuMemcpyHtoA_v2(CUarray dstArray, size_t dstOffset, const void *srcHost, size_t ByteCount);
+    CUresult CUDAAPI cuMemcpyAtoH_v2(void *dstHost, CUarray srcArray, size_t srcOffset, size_t ByteCount);
+    CUresult CUDAAPI cuMemcpyAtoA_v2(CUarray dstArray, size_t dstOffset, CUarray srcArray, size_t srcOffset, size_t ByteCount);
+    CUresult CUDAAPI cuMemcpyHtoAAsync_v2(CUarray dstArray, size_t dstOffset, const void *srcHost, size_t ByteCount, CUstream hStream);
+    CUresult CUDAAPI cuMemcpyAtoHAsync_v2(void *dstHost, CUarray srcArray, size_t srcOffset, size_t ByteCount, CUstream hStream);
+    CUresult CUDAAPI cuMemcpy2D_v2(const CUDA_MEMCPY2D *pCopy);
+    CUresult CUDAAPI cuMemcpy2DUnaligned_v2(const CUDA_MEMCPY2D *pCopy);
+    CUresult CUDAAPI cuMemcpy3D_v2(const CUDA_MEMCPY3D *pCopy);
+    CUresult CUDAAPI cuMemcpyHtoDAsync_v2(CUdeviceptr dstDevice, const void *srcHost, size_t ByteCount, CUstream hStream);
+    CUresult CUDAAPI cuMemcpyDtoHAsync_v2(void *dstHost, CUdeviceptr srcDevice, size_t ByteCount, CUstream hStream);
+    CUresult CUDAAPI cuMemcpyDtoDAsync_v2(CUdeviceptr dstDevice, CUdeviceptr srcDevice, size_t ByteCount, CUstream hStream);
+    CUresult CUDAAPI cuMemcpy2DAsync_v2(const CUDA_MEMCPY2D *pCopy, CUstream hStream);
+    CUresult CUDAAPI cuMemcpy3DAsync_v2(const CUDA_MEMCPY3D *pCopy, CUstream hStream);
+    CUresult CUDAAPI cuMemsetD8_v2(CUdeviceptr dstDevice, unsigned char uc, size_t N);
+    CUresult CUDAAPI cuMemsetD16_v2(CUdeviceptr dstDevice, unsigned short us, size_t N);
+    CUresult CUDAAPI cuMemsetD32_v2(CUdeviceptr dstDevice, unsigned int ui, size_t N);
+    CUresult CUDAAPI cuMemsetD2D8_v2(CUdeviceptr dstDevice, size_t dstPitch, unsigned char uc, size_t Width, size_t Height);
+    CUresult CUDAAPI cuMemsetD2D16_v2(CUdeviceptr dstDevice, size_t dstPitch, unsigned short us, size_t Width, size_t Height);
+    CUresult CUDAAPI cuMemsetD2D32_v2(CUdeviceptr dstDevice, size_t dstPitch, unsigned int ui, size_t Width, size_t Height);
+    CUresult CUDAAPI cuMemcpy(CUdeviceptr dst, CUdeviceptr src, size_t ByteCount);
+    CUresult CUDAAPI cuMemcpyAsync(CUdeviceptr dst, CUdeviceptr src, size_t ByteCount, CUstream hStream);
+    CUresult CUDAAPI cuMemcpyPeer(CUdeviceptr dstDevice, CUcontext dstContext, CUdeviceptr srcDevice, CUcontext srcContext, size_t ByteCount);
+    CUresult CUDAAPI cuMemcpyPeerAsync(CUdeviceptr dstDevice, CUcontext dstContext, CUdeviceptr srcDevice, CUcontext srcContext, size_t ByteCount, CUstream hStream);
+    CUresult CUDAAPI cuMemcpy3DPeer(const CUDA_MEMCPY3D_PEER *pCopy);
+    CUresult CUDAAPI cuMemcpy3DPeerAsync(const CUDA_MEMCPY3D_PEER *pCopy, CUstream hStream);
+
+    CUresult CUDAAPI cuMemsetD8Async(CUdeviceptr dstDevice, unsigned char uc, size_t N, CUstream hStream);
+    CUresult CUDAAPI cuMemsetD16Async(CUdeviceptr dstDevice, unsigned short us, size_t N, CUstream hStream);
+    CUresult CUDAAPI cuMemsetD32Async(CUdeviceptr dstDevice, unsigned int ui, size_t N, CUstream hStream);
+    CUresult CUDAAPI cuMemsetD2D8Async(CUdeviceptr dstDevice, size_t dstPitch, unsigned char uc, size_t Width, size_t Height, CUstream hStream);
+    CUresult CUDAAPI cuMemsetD2D16Async(CUdeviceptr dstDevice, size_t dstPitch, unsigned short us, size_t Width, size_t Height, CUstream hStream);
+    CUresult CUDAAPI cuMemsetD2D32Async(CUdeviceptr dstDevice, size_t dstPitch, unsigned int ui, size_t Width, size_t Height, CUstream hStream);
+
+    CUresult CUDAAPI cuStreamGetPriority(CUstream hStream, int *priority);
+    CUresult CUDAAPI cuStreamGetFlags(CUstream hStream, unsigned int *flags);
+    CUresult CUDAAPI cuStreamGetCtx(CUstream hStream, CUcontext *pctx);
+    CUresult CUDAAPI cuStreamWaitEvent(CUstream hStream, CUevent hEvent, unsigned int Flags);
+    CUresult CUDAAPI cuStreamAddCallback(CUstream hStream, CUstreamCallback callback, void *userData, unsigned int flags);
+    CUresult CUDAAPI cuStreamAttachMemAsync(CUstream hStream, CUdeviceptr dptr, size_t length, unsigned int flags);
+    CUresult CUDAAPI cuStreamQuery(CUstream hStream);
+    CUresult CUDAAPI cuStreamSynchronize(CUstream hStream);
+    CUresult CUDAAPI cuEventRecord(CUevent hEvent, CUstream hStream);
+    CUresult CUDAAPI cuEventRecordWithFlags(CUevent hEvent, CUstream hStream, unsigned int flags);
+    CUresult CUDAAPI cuLaunchKernel(CUfunction f, unsigned int gridDimX, unsigned int gridDimY, unsigned int gridDimZ, unsigned int blockDimX, unsigned int blockDimY, unsigned int blockDimZ, unsigned int sharedMemBytes, CUstream hStream, void **kernelParams, void **extra);
+
+
+
+    CUresult CUDAAPI cuLaunchHostFunc(CUstream hStream, CUhostFn fn, void *userData);
+    CUresult CUDAAPI cuGraphicsMapResources(unsigned int count, CUgraphicsResource *resources, CUstream hStream);
+    CUresult CUDAAPI cuGraphicsUnmapResources(unsigned int count, CUgraphicsResource *resources, CUstream hStream);
+    CUresult CUDAAPI cuStreamWriteValue32(CUstream stream, CUdeviceptr addr, cuuint32_t value, unsigned int flags);
+    CUresult CUDAAPI cuStreamWaitValue32(CUstream stream, CUdeviceptr addr, cuuint32_t value, unsigned int flags);
+    CUresult CUDAAPI cuStreamWriteValue64(CUstream stream, CUdeviceptr addr, cuuint64_t value, unsigned int flags);
+    CUresult CUDAAPI cuStreamWaitValue64(CUstream stream, CUdeviceptr addr, cuuint64_t value, unsigned int flags);
+    CUresult CUDAAPI cuStreamBatchMemOp(CUstream stream, unsigned int count, CUstreamBatchMemOpParams *paramArray, unsigned int flags);
+
+    CUresult CUDAAPI cuStreamWriteValue32_v2(CUstream stream, CUdeviceptr addr, cuuint32_t value, unsigned int flags);
+    CUresult CUDAAPI cuStreamWaitValue32_v2(CUstream stream, CUdeviceptr addr, cuuint32_t value, unsigned int flags);
+    CUresult CUDAAPI cuStreamWriteValue64_v2(CUstream stream, CUdeviceptr addr, cuuint64_t value, unsigned int flags);
+    CUresult CUDAAPI cuStreamWaitValue64_v2(CUstream stream, CUdeviceptr addr, cuuint64_t value, unsigned int flags);
+    CUresult CUDAAPI cuStreamBatchMemOp_v2(CUstream stream, unsigned int count, CUstreamBatchMemOpParams *paramArray, unsigned int flags);
+
+    CUresult CUDAAPI cuMemPrefetchAsync(CUdeviceptr devPtr, size_t count, CUdevice dstDevice, CUstream hStream);
+    CUresult CUDAAPI cuLaunchCooperativeKernel(CUfunction f, unsigned int gridDimX, unsigned int gridDimY, unsigned int gridDimZ, unsigned int blockDimX, unsigned int blockDimY, unsigned int blockDimZ, unsigned int sharedMemBytes, CUstream hStream, void **kernelParams);
+    CUresult CUDAAPI cuSignalExternalSemaphoresAsync(const CUexternalSemaphore *extSemArray, const CUDA_EXTERNAL_SEMAPHORE_SIGNAL_PARAMS *paramsArray, unsigned int numExtSems, CUstream stream);
+    CUresult CUDAAPI cuWaitExternalSemaphoresAsync(const CUexternalSemaphore *extSemArray, const CUDA_EXTERNAL_SEMAPHORE_WAIT_PARAMS *paramsArray, unsigned int numExtSems, CUstream stream);
+    CUresult CUDAAPI cuStreamBeginCapture(CUstream hStream);
+    CUresult CUDAAPI cuStreamBeginCapture_ptsz(CUstream hStream);
+    CUresult CUDAAPI cuStreamBeginCapture_v2(CUstream hStream, CUstreamCaptureMode mode);
+    CUresult CUDAAPI cuStreamEndCapture(CUstream hStream, CUgraph *phGraph);
+    CUresult CUDAAPI cuStreamIsCapturing(CUstream hStream, CUstreamCaptureStatus *captureStatus);
+    CUresult CUDAAPI cuStreamGetCaptureInfo(CUstream hStream, CUstreamCaptureStatus *captureStatus_out, cuuint64_t *id_out);
+    CUresult CUDAAPI cuStreamGetCaptureInfo_v2(CUstream hStream, CUstreamCaptureStatus *captureStatus_out, cuuint64_t *id_out, CUgraph *graph_out, const CUgraphNode **dependencies_out, size_t *numDependencies_out);
+    
+
+
+
+    CUresult CUDAAPI cuGraphUpload(CUgraphExec hGraph, CUstream hStream);
+    CUresult CUDAAPI cuGraphLaunch(CUgraphExec hGraph, CUstream hStream);
+    CUresult CUDAAPI cuStreamCopyAttributes(CUstream dstStream, CUstream srcStream);
+    CUresult CUDAAPI cuStreamGetAttribute(CUstream hStream, CUstreamAttrID attr, CUstreamAttrValue *value);
+    CUresult CUDAAPI cuStreamSetAttribute(CUstream hStream, CUstreamAttrID attr, const CUstreamAttrValue *param);
+
+    CUresult CUDAAPI cuIpcOpenMemHandle(CUdeviceptr *pdptr, CUipcMemHandle handle, unsigned int Flags);
+    CUresult CUDAAPI cuGraphInstantiate(CUgraphExec *phGraphExec, CUgraph hGraph, CUgraphNode *phErrorNode, char *logBuffer, size_t bufferSize);
+    CUresult CUDAAPI cuMemMapArrayAsync(CUarrayMapInfo *mapInfoList, unsigned int count, CUstream hStream);
+
+    CUresult CUDAAPI cuMemFreeAsync(CUdeviceptr dptr, CUstream hStream);
+    CUresult CUDAAPI cuMemAllocAsync(CUdeviceptr *dptr, size_t bytesize, CUstream hStream);
+    CUresult CUDAAPI cuMemAllocFromPoolAsync(CUdeviceptr *dptr, size_t bytesize, CUmemoryPool pool, CUstream hStream);
+
+    CUresult CUDAAPI cuStreamUpdateCaptureDependencies(CUstream hStream, CUgraphNode *dependencies, size_t numDependencies, unsigned int flags);
+#elif defined(__CUDA_API_PER_THREAD_DEFAULT_STREAM)
+
+static inline CUresult cuGetProcAddress_ptsz(const char *symbol, void **funcPtr, int driverVersion, cuuint64_t flags) {
+    const int procAddressMask = (CU_GET_PROC_ADDRESS_LEGACY_STREAM|
+                                 CU_GET_PROC_ADDRESS_PER_THREAD_DEFAULT_STREAM);
+    if ((flags & procAddressMask) == 0) {
+        flags |= CU_GET_PROC_ADDRESS_PER_THREAD_DEFAULT_STREAM;
+    }
+    return cuGetProcAddress(symbol, funcPtr, driverVersion, flags); 
+}
+#define cuGetProcAddress cuGetProcAddress_ptsz
+
+#endif
+
 #ifdef __cplusplus
 }
 #endif
+
+#if defined(__GNUC__)
+  #if defined(__CUDA_API_PUSH_VISIBILITY_DEFAULT)
+    #pragma GCC visibility pop
+  #endif
+#endif
+
+//#undef __CUDA_DEPRECATED
 
 #endif // HIJACK_CUDA_SUBSET_H

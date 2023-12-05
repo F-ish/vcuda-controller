@@ -5,7 +5,7 @@ set -o nounset
 set -o xtrace
 
 ROOT=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd -P)
-IMAGE_FILE=${IMAGE_FILE:-"fish/vcuda:v2test"}
+IMAGE_FILE=${IMAGE_FILE:-"fish/vcuda:11.7head"}
 FILEPATH=$PWD
 img="unishare-ctl"
 version="1.0.0"

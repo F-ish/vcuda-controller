@@ -121,27 +121,14 @@ cuMipmappedArrayCreate(CUmipmappedArray *pHandle,
                        const CUDA_ARRAY3D_DESCRIPTOR *pMipmappedArrayDesc,
                        unsigned int numMipmapLevels);
 */
-CUresult cuDeviceTotalMem_v2(size_t *bytes, CUdevice dev);
 CUresult cuDeviceTotalMem(size_t *bytes, CUdevice dev);
-CUresult cuMemGetInfo_v2(size_t *free, size_t *total);
 CUresult cuMemGetInfo(size_t *free, size_t *total);
-CUresult cuLaunchKernel_ptsz(CUfunction f, unsigned int gridDimX,
-                             unsigned int gridDimY, unsigned int gridDimZ,
-                             unsigned int blockDimX, unsigned int blockDimY,
-                             unsigned int blockDimZ,
-                             unsigned int sharedMemBytes, CUstream hStream,
-                             void **kernelParams, void **extra);
 CUresult cuLaunchKernel(CUfunction f, unsigned int gridDimX,
                         unsigned int gridDimY, unsigned int gridDimZ,
                         unsigned int blockDimX, unsigned int blockDimY,
                         unsigned int blockDimZ, unsigned int sharedMemBytes,
                         CUstream hStream, void **kernelParams, void **extra);
 CUresult cuLaunch(CUfunction f);
-CUresult cuLaunchCooperativeKernel_ptsz(
-    CUfunction f, unsigned int gridDimX, unsigned int gridDimY,
-    unsigned int gridDimZ, unsigned int blockDimX, unsigned int blockDimY,
-    unsigned int blockDimZ, unsigned int sharedMemBytes, CUstream hStream,
-    void **kernelParams);
 CUresult cuLaunchCooperativeKernel(CUfunction f, unsigned int gridDimX,
                                    unsigned int gridDimY, unsigned int gridDimZ,
                                    unsigned int blockDimX,
@@ -168,15 +155,10 @@ entry_t cuda_hooks_entry[] = {
     //{.name = "cuArray3DCreate_v2", .fn_ptr = cuArray3DCreate_v2},
     //{.name = "cuArray3DCreate", .fn_ptr = cuArray3DCreate},
     //{.name = "cuMipmappedArrayCreate", .fn_ptr = cuMipmappedArrayCreate},
-    {.name = "cuDeviceTotalMem_v2", .fn_ptr = cuDeviceTotalMem_v2},
     {.name = "cuDeviceTotalMem", .fn_ptr = cuDeviceTotalMem},
-    {.name = "cuMemGetInfo_v2", .fn_ptr = cuMemGetInfo_v2},
     {.name = "cuMemGetInfo", .fn_ptr = cuMemGetInfo},
-    {.name = "cuLaunchKernel_ptsz", .fn_ptr = cuLaunchKernel_ptsz},
     {.name = "cuLaunchKernel", .fn_ptr = cuLaunchKernel},
     {.name = "cuLaunch", .fn_ptr = cuLaunch},
-    {.name = "cuLaunchCooperativeKernel_ptsz",
-     .fn_ptr = cuLaunchCooperativeKernel_ptsz},
     {.name = "cuLaunchCooperativeKernel", .fn_ptr = cuLaunchCooperativeKernel},
     {.name = "cuLaunchGrid", .fn_ptr = cuLaunchGrid},
     {.name = "cuLaunchGridAsync", .fn_ptr = cuLaunchGridAsync},
@@ -593,13 +575,14 @@ static void initialization() {
 CUresult cuDriverGetVersion(int *driverVersion) {
   CUresult ret;
 
+  printf("----------------------------into hijacking cuDriverGetVersion-------version is:%d----------------\n", *driverVersion);
   load_necessary_data();
   if (!is_custom_config_path()) {
     pthread_once(&g_register_set, register_to_remote);
   }
   pthread_once(&g_init_set, initialization);
   ret = CUDA_ENTRY_CALL(cuda_library_entry, cuDriverGetVersion, driverVersion);
-  printf("----------------------------hijacking cuDriverGetVersion-------version is:%d----------------\n", *driverVersion);
+  printf("----------------------------after call cuDriverGetVersion-------version is:%d----------------\n", *driverVersion);
   if (unlikely(ret)) {
     goto DONE;
   }
@@ -611,8 +594,9 @@ DONE:
 CUresult cuInit(unsigned int flag) {
   CUresult ret;
 
+  printf("----------------------------hijacking cuInit----------------------\n");
   load_necessary_data();
-  if (!is_custom_config_path()) {
+  if (!is_custom_config_path()) { //如果client没有注册到manager，basedir没有变，就重新执行注册
     pthread_once(&g_register_set, register_to_remote);
   }
   pthread_once(&g_init_set, initialization);
@@ -631,6 +615,7 @@ CUresult cuGetProcAddress(const char *symbol, void **pfn, int cudaVersion,
   CUresult ret;
   int i;
   
+  printf("----------------------------hijacking cuGetProcAddress----------------------\n");
   load_necessary_data();
   if (!is_custom_config_path()) {
     pthread_once(&g_register_set, register_to_remote);
@@ -913,14 +898,6 @@ DONE:
   return ret;
 }
 */
-CUresult cuDeviceTotalMem_v2(size_t *bytes, CUdevice dev) {
-   if (g_vcuda_config.enable) {
-    *bytes = g_vcuda_config.gpu_memory;
-
-    return CUDA_SUCCESS;
-  } 
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuDeviceTotalMem_v2, bytes, dev);
-}
 
 CUresult cuDeviceTotalMem(size_t *bytes, CUdevice dev) {
    if (g_vcuda_config.enable) {
@@ -931,20 +908,6 @@ CUresult cuDeviceTotalMem(size_t *bytes, CUdevice dev) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuDeviceTotalMem, bytes, dev);
 }
 
-CUresult cuMemGetInfo_v2(size_t *free, size_t *total) {
-   size_t used = 0;
-
-  if (g_vcuda_config.enable) {
-    atomic_action(pid_path, get_used_gpu_memory, (void *)&used);
-
-    *total = g_vcuda_config.gpu_memory;
-    *free =
-        used > g_vcuda_config.gpu_memory ? 0 : g_vcuda_config.gpu_memory - used;
-
-    return CUDA_SUCCESS;
-  } 
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuMemGetInfo_v2, free, total);
-}
 
 CUresult cuMemGetInfo(size_t *free, size_t *total) {
    size_t used = 0;
@@ -961,18 +924,6 @@ CUresult cuMemGetInfo(size_t *free, size_t *total) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuMemGetInfo, free, total);
 }
 
-CUresult cuLaunchKernel_ptsz(CUfunction f, unsigned int gridDimX,
-                             unsigned int gridDimY, unsigned int gridDimZ,
-                             unsigned int blockDimX, unsigned int blockDimY,
-                             unsigned int blockDimZ,
-                             unsigned int sharedMemBytes, CUstream hStream,
-                             void **kernelParams, void **extra) {
-   rate_limiter(gridDimX * gridDimY * gridDimZ,
-               blockDimX * blockDimY * blockDimZ); 
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchKernel_ptsz, f, gridDimX,
-                         gridDimY, gridDimZ, blockDimX, blockDimY, blockDimZ,
-                         sharedMemBytes, hStream, kernelParams, extra);
-}
 
 CUresult cuLaunchKernel(CUfunction f, unsigned int gridDimX,
                         unsigned int gridDimY, unsigned int gridDimZ,
@@ -991,17 +942,6 @@ CUresult cuLaunch(CUfunction f) {
   return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunch, f);
 }
 
-CUresult cuLaunchCooperativeKernel_ptsz(
-    CUfunction f, unsigned int gridDimX, unsigned int gridDimY,
-    unsigned int gridDimZ, unsigned int blockDimX, unsigned int blockDimY,
-    unsigned int blockDimZ, unsigned int sharedMemBytes, CUstream hStream,
-    void **kernelParams) {
-   rate_limiter(gridDimX * gridDimY * gridDimZ,
-               blockDimX * blockDimY * blockDimZ); 
-  return CUDA_ENTRY_CALL(cuda_library_entry, cuLaunchCooperativeKernel_ptsz, f,
-                         gridDimX, gridDimY, gridDimZ, blockDimX, blockDimY,
-                         blockDimZ, sharedMemBytes, hStream, kernelParams);
-}
 
 CUresult cuLaunchCooperativeKernel(CUfunction f, unsigned int gridDimX,
                                    unsigned int gridDimY, unsigned int gridDimZ,
