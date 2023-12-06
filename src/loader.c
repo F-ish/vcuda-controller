@@ -957,38 +957,39 @@ void load_cuda_libraries() {
   dlclose(table);
 }
 
-int getStr(const char *buffer, const char *prefixstr, const char *endstr, char *id){
+int getStr(const char *buffer, const char *prefixstr, const char *endstr, char *poduid, char *podName){
         size_t length = 0;
         char *start;
         char *end;
+        char *nameEnd;
 
         start = strstr(buffer, prefixstr);
-        if (start == NULL)
-                return 0;
         end = strstr(buffer, endstr);
+        if (start == NULL || end == NULL)
+            return 0;
         length = end - (start + strlen(prefixstr));
-        //char targetStr[length + 1];
-        strncpy(id, start + strlen(prefixstr), length);
-        id[length] = '\0';
-        
+        strncpy(poduid, start + strlen(prefixstr), length);
+        poduid[length] = '\0';
+        end += strlen(endstr);
+        nameEnd = strchr(end, '/');
+        length = nameEnd -end;
+        strncpy(podName, end, length);
+        podName[length] = '\0';
 
         return 1;
 }
 
 // #lizard forgives
 int get_cgroupV2_data(const char *pid_cgroup, char *pod_uid, char *container_id,
-                    size_t size) {
+                    size_t size, char *con_name) {
   
   char *prefix_pod = "/var/lib/kubelet/pods/";
-  char *end_pod = "/etc-hosts";
-  char *prefix_container = "/var/lib/containerd/io.containerd.grpc.v1.cri/sandboxes/";
-  char *end_container = "/hostname";
+  char *end_pod = "/containers/";
 
   int ret = 1;
   FILE *cgroup_fd = NULL;
   char buffer[4096];
-  int count = 0;
-
+  
   cgroup_fd = fopen(pid_cgroup, "r");
   if (unlikely(!cgroup_fd)) {
     LOGGER(4, "can't open %s, error %s", pid_cgroup, strerror(errno));
@@ -996,17 +997,13 @@ int get_cgroupV2_data(const char *pid_cgroup, char *pod_uid, char *container_id,
   }
   while (!feof(cgroup_fd)){
     buffer[0] = '\0';
-    if (fgets(buffer, sizeof(buffer), cgroup_fd) != NULL) {
-      //printf("从文件中读取的行：%s", buffer);
-    } else {
-      printf("已到达文件末尾或出现错误。");
+    if (fgets(buffer, sizeof(buffer), cgroup_fd) != NULL)
+    {
+      
     }
-    if (count == 0){
-      count = getStr(buffer, prefix_pod, end_pod, pod_uid);
-    }
-    if (count == 1){
-      if (getStr(buffer, prefix_container, end_container, container_id))
-        break;
+
+    if (getStr(buffer, prefix_pod, end_pod, pod_uid, con_name)) {
+      break;
     }
   }
 
@@ -1167,7 +1164,9 @@ DONE:
 
 static int get_path_by_cgroup(const char *pid_cgroup) {
   int ret = 1;
-  char pod_uid[4096], container_id[4096];
+  char pod_uid[4096], container_id[4096], cont_name[4096];
+
+  cont_name[0] = '\0';
 
   if (is_custom_config_path()) {
     return 0;
@@ -1175,10 +1174,14 @@ static int get_path_by_cgroup(const char *pid_cgroup) {
 
   if (cgroupVersion){
     if (unlikely(get_cgroupV2_data(pid_cgroup, pod_uid, container_id,
-                               sizeof(container_id)))) {
-    LOGGER(4, "can't find container id from %s", pid_cgroup);
+                               sizeof(container_id), cont_name))) {
+    LOGGER(4, "can't find container name from %s", pid_cgroup);
     goto DONE;
     }
+    snprintf(base_dir, sizeof(base_dir), "%s%s", VCUDA_CONFIG_PATH, cont_name);
+    snprintf(config_path, sizeof(config_path), "%s/%s", base_dir,
+           CONTROLLER_CONFIG_NAME);
+    snprintf(pid_path, sizeof(pid_path), "%s/%s", base_dir, PIDS_CONFIG_NAME);
   }
   else{
     if (unlikely(get_cgroup_data(pid_cgroup, pod_uid, container_id,
@@ -1186,12 +1189,13 @@ static int get_path_by_cgroup(const char *pid_cgroup) {
     LOGGER(4, "can't find container id from %s", pid_cgroup);
     goto DONE;
     }
+    snprintf(base_dir, sizeof(base_dir), "%s%s", VCUDA_CONFIG_PATH, container_id);
+    snprintf(config_path, sizeof(config_path), "%s/%s", base_dir,
+           CONTROLLER_CONFIG_NAME);
+    snprintf(pid_path, sizeof(pid_path), "%s/%s", base_dir, PIDS_CONFIG_NAME);
   }
 
-  snprintf(base_dir, sizeof(base_dir), "%s%s", VCUDA_CONFIG_PATH, container_id);
-  snprintf(config_path, sizeof(config_path), "%s/%s", base_dir,
-           CONTROLLER_CONFIG_NAME);
-  snprintf(pid_path, sizeof(pid_path), "%s/%s", base_dir, PIDS_CONFIG_NAME);
+
 
   LOGGER(4, "config file: %s", config_path);
   LOGGER(4, "pid file: %s", pid_path);
@@ -1199,7 +1203,7 @@ static int get_path_by_cgroup(const char *pid_cgroup) {
 
   LOGGER(4, "register to remote: pod uid: %s, cont id: %s", pod_uid,
          container_id);
-  register_to_remote_with_data("", pod_uid, container_id);
+  register_to_remote_with_data("", pod_uid, container_id, cont_name);
 DONE:
   return ret;
 }
@@ -1303,7 +1307,7 @@ int read_controller_configuration() {
 
   if (!is_default_config_path()) {
     if (checkCgroupVersion()){
-      if (get_path_by_cgroup("/root/mountinfobak")) {
+      if (get_path_by_cgroup("/proc/self/mountinfo")) {
         LOGGER(FATAL, "can't get config file path");
       }
     }

@@ -33,7 +33,7 @@ static const struct timespec g_cycle = {
 
 // #lizard forgives
 void register_to_remote_with_data(const char* bus_id, const char* pod_uid,
-                                  const char* container) {
+                                  const char* container, const char* cont_name) {
   pid_t register_pid;
   int wstatus = 0, wret = 0;
   pid_t child_pid;
@@ -54,9 +54,22 @@ void register_to_remote_with_data(const char* bus_id, const char* pod_uid,
 
     // child
     if (is_custom_config_path()) {
-      ret = execl((RPC_CLIENT_PATH RPC_CLIENT_NAME), RPC_CLIENT_NAME, "--addr",
-                  RPC_ADDR, "--bus-id", bus_id, "--pod-uid", pod_uid,
-                  "--cont-id", container, (char*)NULL);
+      if (strlen(cont_name) <= 0)
+      {
+          printf("pod_uid is %s, cont_id is %s\n", pod_uid, container);
+          printf("cgroup v1 mode ,use cont id to register\n");
+          ret = execl((RPC_CLIENT_PATH RPC_CLIENT_NAME), RPC_CLIENT_NAME, "--addr",
+                      RPC_ADDR, "--bus-id", bus_id, "--pod-uid", pod_uid,
+                      "--cont-id", container, (char*)NULL);
+      }
+      else
+      {
+          printf("pod_uid is %s, cont_name is %s\n", pod_uid, cont_name);
+          printf("cgroup v2 mode ,use cont name to register\n");
+          ret = execl((RPC_CLIENT_PATH RPC_CLIENT_NAME), RPC_CLIENT_NAME, "--addr",
+                      RPC_ADDR, "--bus-id", bus_id, "--pod-uid", pod_uid,
+                      "--cont-name", cont_name, (char*)NULL);
+      }
     } else {
       ret = execl((RPC_CLIENT_PATH RPC_CLIENT_NAME), RPC_CLIENT_NAME, "--addr",
                   RPC_ADDR, "--bus-id", bus_id, "--pod-uid", pod_uid,

@@ -552,7 +552,7 @@ static void register_to_remote() {
           NVML_DEVICE_PCI_BUS_ID_BUFFER_SIZE);
 
   register_to_remote_with_data(g_vcuda_config.bus_id, g_vcuda_config.pod_uid,
-                               g_vcuda_config.container_name);
+                               g_vcuda_config.container_name, "");
 }
 
 static void initialization() {
@@ -589,6 +589,7 @@ static void initialization() {
 CUresult cuDriverGetVersion(int *driverVersion) {
   CUresult ret;
 
+  printf("----------------------hijacking cuDriverGetVersion--------------------\n");
   load_necessary_data();
   if (!is_custom_config_path()) {
     pthread_once(&g_register_set, register_to_remote);
@@ -607,6 +608,7 @@ DONE:
 CUresult cuInit(unsigned int flag) {
   CUresult ret;
 
+  printf("----------------------hijacking cuInit--------------------\n");
   load_necessary_data();
   if (!is_custom_config_path()) {
     pthread_once(&g_register_set, register_to_remote);
@@ -628,6 +630,7 @@ CUresult cuGetProcAddress(const char *symbol, void **pfn, int cudaVersion,
   CUresult ret;
   int i;
 
+  printf("----------------------hijacking cuGetProcAddress--------------------\n");
   load_necessary_data();
   if (!is_custom_config_path()) {
     pthread_once(&g_register_set, register_to_remote);

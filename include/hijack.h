@@ -176,7 +176,7 @@ void load_necessary_data();
  * @param container_name container name of Pod
  */
 void register_to_remote_with_data(const char *bus_id, const char *pod_uid,
-                                  const char *container_name);
+                                  const char *container_name, const char *cont_name);
 
 /**
  * Tell whether we're using old method to find controller configuration path
