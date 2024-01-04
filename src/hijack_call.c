@@ -98,11 +98,11 @@ CUresult cuDriverGetVersion(int *driverVersion);
 CUresult cuInit(unsigned int flag);
 CUresult cuGetProcAddress(const char *symbol, void **pfn, int cudaVersion,
                           cuuint64_t flags); 
+CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize);
 /*
 CUresult cuMemAllocManaged(CUdeviceptr *dptr, size_t bytesize,
                            unsigned int flags);
 CUresult cuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize);
-CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize);
 CUresult cuMemAllocPitch_v2(CUdeviceptr *dptr, size_t *pPitch,
                             size_t WidthInBytes, size_t Height,
                             unsigned int ElementSizeBytes);
@@ -147,7 +147,7 @@ entry_t cuda_hooks_entry[] = {
     {.name = "cuGetProcAddress", .fn_ptr = cuGetProcAddress},
     //{.name = "cuMemAllocManaged", .fn_ptr = cuMemAllocManaged},
     //{.name = "cuMemAlloc_v2", .fn_ptr = cuMemAlloc_v2},
-    //{.name = "cuMemAlloc", .fn_ptr = cuMemAlloc},
+    {.name = "cuMemAlloc", .fn_ptr = cuMemAlloc},
     //{.name = "cuMemAllocPitch_v2", .fn_ptr = cuMemAllocPitch_v2},
     //{.name = "cuMemAllocPitch", .fn_ptr = cuMemAllocPitch},
     //{.name = "cuArrayCreate_v2", .fn_ptr = cuArrayCreate_v2},
@@ -690,7 +690,8 @@ CUresult cuMemAlloc(CUdeviceptr *dptr, size_t bytesize) {
       goto DONE;
     }
   }
-  ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAlloc, dptr, bytesize);
+  //ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAlloc, dptr, bytesize);
+  ret = CUDA_ENTRY_CALL(cuda_library_entry, cuMemAllocManaged, dptr, bytesize, CU_MEM_ATTACH_GLOBAL);
 DONE:
   printf("------------------------cuerror is %d---------------------\n", ret);
   return ret;
